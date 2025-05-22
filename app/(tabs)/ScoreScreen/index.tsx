@@ -16,7 +16,7 @@ const PontuacaoScreen: React.FC = () => {
       resizeMode="cover"
     >
         <View style={styles.bullets}>
-                  {Array.from({ length: 94}).map((_, index) => (
+                  {Array.from({ length: 30}).map((_, index) => (
                     <View key={index} style={styles.bullet} />
                   ))}
                 </View>
@@ -33,7 +33,7 @@ const PontuacaoScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.bullets}>
-                {Array.from({ length: 94 }).map((_, index) => (
+                {Array.from({ length: 50 }).map((_, index) => (
                   <View key={index} style={styles.bullet} />
                 ))}
               </View>
@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     marginVertical: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   bullet: {
     width: 10,

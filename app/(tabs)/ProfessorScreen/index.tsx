@@ -7,8 +7,12 @@ export default function StartScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
 
-  const handleStart = () => {
-    router.push('../../../(tabs)/SerieScreen');
+  const handleCadastro = () => {
+    router.push('/(tabs)/CadastroScreen');
+  };
+
+  const handleEditar = () => {
+    router.push('../(tabs)/EditarScreen/index');
   };
 
   const handleHistory = () => {
@@ -22,8 +26,9 @@ export default function StartScreen() {
         style={styles.container}
         resizeMode="cover"
       >
+
         {/* Seta de voltar */}
-        <TouchableOpacity style={[styles.backIcon, width > 768 && styles.backIconDesktop]} onPress={() => router.push('../(tabs)')}>
+        <TouchableOpacity style={[styles.backIcon, width > 768 && styles.backIconDesktop]} onPress={() => router.push('/(tabs)')}>
           <Ionicons name="arrow-back" size={30} color="white" />
         </TouchableOpacity>
 
@@ -33,21 +38,25 @@ export default function StartScreen() {
         </TouchableOpacity>
 
         <View style={[styles.overlay, width > 768 && styles.overlayDesktop]}>
+          
           <Text style={[styles.title, width > 768 && styles.titleDesktop]}>
             POLIEDRO{"\n"}DO MILHÃO
           </Text>
 
           <Image source={require('../../../assets/images/Coin.png')} style={styles.coin} />
 
-          {/* <Image source={require('../../../assets/images/Cortina1.png')} style={styles.Image} /> */}
+          <TouchableOpacity style={[styles.button, width > 768 && styles.buttonDesktop]} onPress={handleCadastro}>
+            <Text style={styles.buttonText}>Cadastrar Aluno</Text>
+          </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.button, width > 768 && styles.buttonDesktop]} onPress={handleStart}>
-            <Text style={styles.buttonText}>Jogar</Text>
+          <TouchableOpacity style={[styles.button, width > 768 && styles.buttonDesktop]} onPress={handleEditar}>
+            <Text style={styles.buttonText}>Editar Perguntas</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.button, width > 768 && styles.buttonDesktop]} onPress={handleHistory}>
             <Text style={styles.buttonText}>Histórico</Text>
           </TouchableOpacity>
+       
         </View>
       </ImageBackground>
     </ScrollView>
