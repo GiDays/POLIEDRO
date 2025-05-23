@@ -29,7 +29,15 @@ export default function App() {
 
     console.log('Login bem-sucedido:', resposta.data);
     alert('Login realizado com sucesso!');
-    router.push('../(tabs)/HomeScreen/');
+
+    if (email.includes('@professor')) {
+      router.push('../(tabs)/ProfessorScreen/');
+    } else if (email.includes('@aluno')) {
+      router.push('../(tabs)/AlunoScreen/');
+    } else {
+      router.push('../(tabs)/HomeScreen/');
+    }
+   
   } catch (erro) {
     const err = erro as any;
     console.error('Erro no login:', err.response?.data || err.message);
