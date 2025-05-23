@@ -33,9 +33,9 @@ export default function App() {
     if (email.includes('@professor')) {
       router.push('../(tabs)/ProfessorScreen/');
     } else if (email.includes('@aluno')) {
-      router.push('../(tabs)/AlunoScreen/');
+      router.push('../../(tabs)/HomeScreen/');
     } else {
-      router.push('../(tabs)/HomeScreen/');
+      router.push('../../(tabs)/HomeScreen/');
     }
    
   } catch (erro) {
