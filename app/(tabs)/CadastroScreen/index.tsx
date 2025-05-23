@@ -11,10 +11,32 @@ export default function CadastroUsuario() {
   const [nome, setNome] = useState('');
   const [senha, setSenha] = useState('');
 
-  const handleFinalizarCadastro = () => {
-    //Alert.alert('Cadastro finalizado!');
-    router.push('../(tabs)/HomeScreen');
-  };
+ const handleFinalizarCadastro = async () => {
+  if (!email || !senha) {
+    Alert.alert('Erro', 'Preencha todos os campos!');
+    return;
+  }
+
+  try {
+    const response = await fetch('http://192.168.0.20:5000/registro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha, nome })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+      router.push('../(tabs)/HomeScreen');
+    } else {
+      Alert.alert('Erro', data.error || 'Erro ao cadastrar');
+    }
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    Alert.alert('Erro', 'Não foi possível se conectar ao servidor.');
+  }
+};
 
 
   return (
