@@ -15,7 +15,8 @@ export default function App() {
   const [senha, setSenha] = useState('');
 
   // função de login 
-  const handleCadastro = () => {
+  const handleCadastro = () => { 
+
   if (!email || !senha) {
     alert('Preencha todos os campos!');
     return;
@@ -26,7 +27,7 @@ export default function App() {
 
   // Navega para a tela principal
   router.push('../(tabs)/HomeScreen/');
-};
+  };
 
   //vai para a tela de cadastro de usuário
   const handleIrParaCadastro = () => {

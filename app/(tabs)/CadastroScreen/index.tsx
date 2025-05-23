@@ -3,49 +3,72 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {TextInput,TouchableOpacity,ImageBackground,Image,View,Text,StyleSheet,useWindowDimensions,ScrollView,Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
+// Declara componete funcional (CadastroUsuário)
 export default function CadastroUsuario() {
+
+  // Dimensões da Tela
   const { width } = Dimensions.get('window');
+
+  // Métodos para navegar entre as telas
   const router = useRouter();
+
+  // Cria estados com string vazia para armazenar os valores digitados pelos usuários
   const [email, setEmail] = useState('');
   const [nome, setNome] = useState('');
   const [senha, setSenha] = useState('');
 
- const handleFinalizarCadastro = async () => {
-  if (!email || !senha) {
-    Alert.alert('Erro', 'Preencha todos os campos!');
-    return;
-  }
+  // Função que será chamada quando clicar no botão "Finalizar Cadastro"
+  const handleFinalizarCadastro = async () => {
+    
+    // Teste de valores:
+    // alert('email e senha:' + email + nome + senha);
 
-  try {
-    const response = await fetch('http://192.168.0.20:5000/registro', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, senha, nome })
-    });
+    if (!email || !senha) {
+      Alert.alert('Erro', 'Preencha todos os campos!');
+      return;
+    }
 
-    const data = await response.json();
+    try {
+      // Teste:
+      // alert('email e senha:' + email + senha);
 
-    if (response.ok) {
+      //Fetch para a requisição HTTP, Post para enviar os dados, await para esperar a resposta
+      const response = await axios.post('http://192.168.15.169:5000/registro', {email, senha, nome});
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ email, senha, nome })
+      // });
+
+      // const data = await response.json();
+
+      // if (response.ok) {
+      //   Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+      //   router.push('../(tabs)/HomeScreen');
+      // } else {
+      //   Alert.alert('Erro', data.error || 'Erro ao cadastrar');
+      // }
+      
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
       router.push('../(tabs)/HomeScreen');
-    } else {
-      Alert.alert('Erro', data.error || 'Erro ao cadastrar');
-    }
+  //   
   } catch (error) {
-    console.error('Erro na requisição:', error);
-    Alert.alert('Erro', 'Não foi possível se conectar ao servidor.');
+  const err = error as any;
+  Alert.alert('Erro', err.response?.data?.error || 'Não foi possível se conectar ao servidor.');
   }
 };
 
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
+      
       <ImageBackground
         source={require('../../../assets/images/TelaAzul.png')}
         style={styles.container}
         resizeMode="cover"
       >
+
         {/* Seta de voltar */}
         <TouchableOpacity style={[styles.backIcon, width > 768 && styles.backIconDesktop]} onPress={() => router.push('../(tabs)')}>
           <Ionicons name="arrow-back" size={30} color="white" />
@@ -59,6 +82,7 @@ export default function CadastroUsuario() {
         <View style={[styles.overlay, width > 768 && styles.overlayDesktop]}>
 
           <Text style={[styles.title, width > 768 && styles.titleDesktop]}>POLIEDRO{"\n"}DO MILHÃO</Text>
+          
           <Image source={require('../../../assets/images/Coin.png')} style={styles.coin} />
           
           <Text style={[styles.subtitle, width > 768 && styles.subtitleDesktop]}>CADASTRO USUÁRIO</Text>
@@ -89,8 +113,11 @@ export default function CadastroUsuario() {
           <TouchableOpacity style={styles.button} onPress={handleFinalizarCadastro}>
             <Text style={styles.buttonText}>Finalizar Cadastro</Text>
           </TouchableOpacity>
+          
         </View>
+
       </ImageBackground>
+
     </ScrollView>
   );
 }
@@ -126,7 +153,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
-    //fontWeight: 'bold',
     textAlign: 'center',
     color: '#FFD700',
     marginBottom: 10,
