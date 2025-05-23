@@ -2,7 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const { networkInterfaces } = require("os");
 require("dotenv").config();
 
 const app = express();
@@ -20,20 +21,30 @@ const PORT = process.env.PORT || 5000;
 // app.use("/uploads", express.static("uploads"));
 app.use(
   cors({
-    origin: "*", // Em ambiente de produção, especifique as origens permitidas
+    origin: "*", // ambiente de produção
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(bodyParser.json());
 
+// Função para conectar ao MongoDB
+async function conectarAoMongoDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Conectado ao MongoDB Atlas");
+  } catch (err) {
+    console.error("Erro ao conectar ao MongoDB:", err);
+  }
+}
+
 // Conexão com o MongoDB Atlas
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("Conectado ao MongoDB Atlas"))
-  .catch((err) => console.error("Erro ao conectar ao MongoDB:", err));
+// mongoose
+//   .connect(process.env.MONGO_URI)
+//   .then(() => console.log("Conectado ao MongoDB Atlas"))
+//   .catch((err) => console.error("Erro ao conectar ao MongoDB:", err));
 
-
+// Modelo de usuário
 const UsuarioSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   senha: { type: String, required: true },
@@ -45,14 +56,14 @@ const Usuario = mongoose.model("Usuario", UsuarioSchema);
 // Rotas
 
 app.post("/registro", async (req, res) => {
-//   console.log("Requisição de registro recebida:", req.body);
-//   console.log("Headers:", req.headers);
+  console.log("Requisição de registro recebida:", req.body);
+  //console.log("Headers:", req.headers);
 
   const { email, senha, nome } = req.body || {};
 
-  console.log("Email recebido:", email);
-  console.log("Senha recebida:", senha);
-  console.log("Nome recebido:", nome);
+  // console.log("Email recebido:", email);
+  // console.log("Senha recebida:", senha);
+  // console.log("Nome recebido:", nome);
 
   if (!email || !senha) {
     console.log("Email ou senha ausentes");
@@ -79,8 +90,40 @@ app.post("/registro", async (req, res) => {
   }
 });
 
+// Rota para conectar com o banco 
+// app.listen(5000, () => {
+//     try {
+//         conectarAoMongoDB()
+//         console.log("Conectado ao banco de dados")
+//     }
+//     catch (e) {
+//         console.log("Erro de conexão")
+//     }
+// });
 
-// Rota para login
+// Iniciar o servidor
+// app.listen(PORT, "0.0.0.0", () => {
+//   console.log(`Servidor rodando na porta ${PORT}`);
+
+//   // Mostra os IPs disponíveis para acesso
+//   const { networkInterfaces } = require("os");
+//   const nets = networkInterfaces();
+
+//   console.log(`Acesso local: http://localhost:${PORT}`);
+//   console.log("Endereços para acesso de dispositivos móveis:");
+
+//   // Lista todos os IPs disponíveis
+//   Object.keys(nets).forEach((name) => {
+//     nets[name].forEach((net) => {
+//       // Mostra apenas endereços IPv4 e não-internos
+//       if (net.family === "IPv4" && !net.internal) {
+//         console.log(`- http://${net.address}:${PORT} (${name})`);
+//       }
+//     });
+//   });
+// });
+
+//Rota para login 
 app.post("/login", async (req, res) => {
 
   console.log("Requisição de login recebida:", req.body);
@@ -108,14 +151,23 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ error: "Erro ao fazer login" });
     }
 
-app.listen(5000, () => {
-    try {
-        conectarAoMongoDB()
-        console.log("Conectado ao banco de dados")
-    }
-    catch (e) {
-        console.log("Erro de conexão")
-    }
-})
+});
 
+// Iniciar o servidor
+app.listen(PORT, "0.0.0.0", async () => {
+  await conectarAoMongoDB();
+
+  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`Acesso local: http://localhost:${PORT}`);
+  console.log("Endereços para acesso de dispositivos móveis:");
+
+  const nets = networkInterfaces();
+
+  Object.keys(nets).forEach((name) => {
+    nets[name].forEach((net) => {
+      if (net.family === "IPv4" && !net.internal) {
+        console.log(`- http://${net.address}:${PORT} (${name})`);
+      }
+    });
+  });
 });
