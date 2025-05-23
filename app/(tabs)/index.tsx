@@ -3,7 +3,7 @@ import { Audio } from 'expo-av';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-
+import axios from 'axios';
 
 export default function App() {
   // navegação entre telas:
@@ -15,22 +15,29 @@ export default function App() {
   const [senha, setSenha] = useState('');
 
   // função de login 
-  const handleCadastro = () => { 
-
+  const handleLogin = async () => {
   if (!email || !senha) {
     alert('Preencha todos os campos!');
     return;
   }
 
-  // Simulação de login bem-sucedido
-  console.log('Login simulado:', { email, senha });
+  try {
+    const resposta = await axios.post('http://192.168.15.169:5000/login', {
+      email,
+      senha
+    });
 
-  // Navega para a tela principal
-  router.push('../(tabs)/HomeScreen/');
-  };
+    console.log('Login bem-sucedido:', resposta.data);
+    alert('Login realizado com sucesso!');
+    router.push('../(tabs)/HomeScreen/');
+  } catch (erro) {
+    const err = erro as any;
+    console.error('Erro no login:', err.response?.data || err.message);
+    alert(err.response?.data?.mensagem || 'Erro ao tentar logar!');
+  }
+};
 
-  //vai para a tela de cadastro de usuário
-  const handleIrParaCadastro = () => {
+const handleIrParaCadastro = () => {
     router.push('../../(tabs)/CadastroScreen/'); 
   };
   
@@ -106,7 +113,7 @@ export default function App() {
             value={senha}
           />
 
-          <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Entrar</Text>
           </TouchableOpacity>
           
