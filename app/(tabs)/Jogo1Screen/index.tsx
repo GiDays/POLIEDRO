@@ -103,11 +103,10 @@ export default function QuizScreen() {
   if (parou) {
     premioFinal = premios[indicePergunta - 1] || 0;
   } else if (jogoFinalizado) {
-    if (pontuacao === perguntas.length) {
-      // Acertou tudo!
+    if (indicePergunta === perguntas.length - 1 && jogoFinalizado) {
+      // Se chegou até o final, mesmo que tenha pulado, ganha o prêmio máximo
       premioFinal = premios[premios.length - 1];
     } else {
-      // Errou
       premioFinal = calcularPatamar(indicePergunta);
     }
   }
@@ -200,7 +199,7 @@ function reiniciarJogo() {
   setPontuacao(0);
   setJogoFinalizado(false);
   setParou(false);
-  setUsosPular(3);
+  setUsosPular(1);
   setCarregando(true);
   setUsouDica(false);
 
@@ -430,9 +429,9 @@ const styles = StyleSheet.create({
   fontSize: 16,
   color: '#FFF',
   fontStyle: 'italic',
-  marginTop: 10,
+  marginTop: 2,
   backgroundColor: 'rgba(255,255,255,0.1)',
-  padding: 10,
+  padding: 5,
   borderRadius: 10,
   },
 });
