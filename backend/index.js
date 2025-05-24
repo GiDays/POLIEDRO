@@ -104,7 +104,51 @@ app.get('/quiz', async (req, res) => {
   }
 });
 
-// Servidor rodando
+// Modelo de Editar Pergunta
+// Atualizar pergunta
+// app.put('/perguntas/:id', async (req, res) => {
+//   try {
+//     const { pergunta, alternativas, correta, nivel, dica } = req.body;
+
+//     const perguntaAtualizada = await Pergunta.findByIdAndUpdate(
+//       req.params.id,
+//       { pergunta, alternativas, correta, nivel, dica },
+//       { new: true }
+//     );
+
+//     if (!perguntaAtualizada) {
+//       return res.status(404).json({ message: 'Pergunta não encontrada' });
+//     }
+
+//     res.json(perguntaAtualizada);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Erro ao atualizar a pergunta' });
+//   }
+// });
+
+// Salvar nova pergunta
+app.post('/perguntas', async (req, res) => {
+  try {
+    const novaPergunta = new Pergunta({
+      pergunta: req.body.pergunta,
+      alternativas: req.body.alternativas,
+      correta: req.body.correta,
+      nivel: req.body.nivel,
+      dica: req.body.dica
+    });
+
+    const perguntaSalva = await novaPergunta.save();
+    res.status(201).json(perguntaSalva);
+  } catch (err) {
+    console.error('Erro ao salvar pergunta:', err);
+    res.status(500).json({ error: 'Erro ao salvar pergunta' });
+  }
+});
+
+
+
+// Servidor rodando (Rota de Teste)
 app.get('/', (req, res) => {
   res.send('Servidor backend está rodando!');
 });

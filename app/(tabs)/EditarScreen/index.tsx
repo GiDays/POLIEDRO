@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions, Image, ImageBackground, ScrollView
-} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions, Image, ImageBackground, ScrollView} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import axios from 'axios';
 
 export default function EditarPerguntaScreen() {
   const { width } = useWindowDimensions();
@@ -20,16 +19,48 @@ export default function EditarPerguntaScreen() {
 
   const [dificuldade, setDificuldade] = useState('');
   const [alternativaCorreta, setAlternativaCorreta] = useState('');
+  const [dica, setDica] = useState('');
 
-  const handleSalvar = () => {
-    if (!pergunta || !alternativas.A || !alternativas.B || !alternativas.C || !alternativas.D || !dificuldade || !alternativaCorreta) {
-      alert('Preencha todos os campos!');
-      return;
-    }
+  //const [id, setId] = useState('');
 
-    // Aqui você pode salvar no banco ou API
-    alert('Pergunta salva com sucesso!');
+  const handleSalvar = async () => {
+  if (
+    !pergunta ||
+    !alternativas.A ||
+    !alternativas.B ||
+    !alternativas.C ||
+    !alternativas.D ||
+    !dificuldade ||
+    !alternativaCorreta
+  ) {
+    alert('Preencha todos os campos!');
+    return;
+  }
+
+  const alternativasArray = (['A', 'B', 'C', 'D'] as LetraAlternativa[]).map(
+    (letra) => `${letra}) ${alternativas[letra]}`
+  );
+
+  const correta = `${alternativaCorreta}) ${alternativas[alternativaCorreta as LetraAlternativa]}`;
+
+  const data = {
+    nivel: dificuldade,
+    pergunta,
+    alternativas: alternativasArray,   
+    correta: correta,
+    dica: dica
   };
+
+  try {
+    await axios.post('http://192.168.15.169:5000/perguntas', data);
+    alert('Pergunta salva com sucesso!');
+  } catch (error) {
+    console.error(error);
+    alert('Erro ao salvar a pergunta');
+  }
+};
+
+
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -50,6 +81,15 @@ export default function EditarPerguntaScreen() {
             placeholderTextColor="#fff"
           />
 
+          <Text style={styles.label}>Dica:</Text>
+          <TextInput
+            style={styles.input}
+            value={dica}
+            onChangeText={setDica}
+            placeholder="Digite a dica"
+            placeholderTextColor="#fff"
+          />
+
     {(['A', 'B', 'C', 'D'] as LetraAlternativa[]).map((letra) => (
         <View key={letra} style={{width: '60%'}}>
             <Text style={styles.label}>Alternativa {letra}:</Text>
@@ -64,7 +104,11 @@ export default function EditarPerguntaScreen() {
             />
         </View>
     ))}
-        <View style={{ width: '60%' }}>
+
+
+
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '90%', marginTop: 10 }}>
+        <View style={{ width: '45%' }}>
             <Text style={styles.label}>Dificuldade:</Text>
             <View style={styles.pickerContainer}>
                 <Picker
@@ -77,30 +121,51 @@ export default function EditarPerguntaScreen() {
                 <Picker.Item label="Fácil" value="facil" />
                 <Picker.Item label="Médio" value="medio" />
                 <Picker.Item label="Difícil" value="dificil" />
+                <Picker.Item label="Muito Difícil" value="muito_dificil" />
                 </Picker>
             </View>
         </View>
           
-          <View style={{ width: '60%' }}>
-            <Text style={styles.label}>Alternativa Correta:</Text>
-            <View style={styles.pickerContainer}>
-                <Picker
-                selectedValue={alternativaCorreta}
-                onValueChange={(itemValue) => setAlternativaCorreta(itemValue)}
-                dropdownIconColor="white"
-                style={styles.picker}
-                >
-                <Picker.Item label="Selecione..." value="" />
-                <Picker.Item label="A" value="A" />
-                <Picker.Item label="B" value="B" />
-                <Picker.Item label="C" value="C" />
-                <Picker.Item label="D" value="D" />
-                </Picker>
-            </View>
-         </View>
+        <View style={{ width: '45%' }}>
+          <Text style={styles.label}>Alternativa Correta:</Text>
+          <View style={styles.pickerContainer}>
+              <Picker
+              selectedValue={alternativaCorreta}
+              onValueChange={(itemValue) => setAlternativaCorreta(itemValue)}
+              dropdownIconColor="white"
+              style={styles.picker}
+              >
+              <Picker.Item label="Selecione..." value="" />
+              <Picker.Item label="A" value="A" />
+              <Picker.Item label="B" value="B" />
+              <Picker.Item label="C" value="C" />
+              <Picker.Item label="D" value="D" />
+              </Picker>
+          </View>
+        </View>
+
+        {/* <View style={{ width: '30%' }}>
+          <Text style={styles.label}>Série:</Text>
+          <View style={styles.pickerContainer}>
+              <Picker
+              selectedValue={alternativaCorreta}
+              onValueChange={(itemValue) => setAlternativaCorreta(itemValue)}
+              dropdownIconColor="white"
+              style={styles.picker}
+              >
+              <Picker.Item label="Selecione..." value="" />
+              <Picker.Item label="1ª Série" value="1" />
+              <Picker.Item label="2ª Série" value="2" />
+              <Picker.Item label="3ª Série" value="3" />
+              </Picker>
+          </View>
+        </View> */}
+      </View>
+
           <TouchableOpacity style={styles.saveButton} onPress={handleSalvar}>
             <Text style={styles.saveButtonText}>Salvar</Text>
           </TouchableOpacity>
+
         </View>
       </ImageBackground>
     </ScrollView>
@@ -132,7 +197,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     alignSelf: 'flex-start',
-    marginTop: 10,
+    marginTop: 5,
   },
   input: {
     backgroundColor: '#48BFC1',
