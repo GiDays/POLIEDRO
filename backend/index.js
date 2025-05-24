@@ -78,7 +78,8 @@ const PerguntaSchema = new mongoose.Schema({
   nivel: String,
   pergunta: String,
   alternativas: [String],
-  correta: String
+  correta: String,
+  dica: String
 });
 const Pergunta = mongoose.model('Pergunta', PerguntaSchema, 'questoes'); // nome da coleção
 

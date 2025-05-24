@@ -9,6 +9,7 @@ interface Pergunta {
   alternativas: string[];
   correta: string;
   dificuldade: 'fácil' | 'médio' | 'difícil' | 'muito_dificil';
+  dica: string;
 }
 
 export default function QuizScreen() {
@@ -22,8 +23,11 @@ export default function QuizScreen() {
   const [jogoFinalizado, setJogoFinalizado] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [parou, setParou] = useState(false); // Parar o jogo 
-  const [usosPular, setUsosPular] = useState(3); // Pular pergunta
+  const [usosPular, setUsosPular] = useState(1); // Pular pergunta
   const [alternativasVisiveis, setAlternativasVisiveis] = useState<string[]>([]); // -2 alternativas
+  const [mostrarDica, setMostrarDica] = useState(false); //Dica
+  const [usouDica, setUsouDica] = useState(false);
+  
   const perguntaAtual = perguntas[indicePergunta];
 
   const premios = [
@@ -43,6 +47,7 @@ export default function QuizScreen() {
   useEffect(() => {
   if (perguntaAtual) {
     setAlternativasVisiveis(perguntaAtual.alternativas);
+    setMostrarDica(false);
   }
   }, [indicePergunta, perguntas]);
 
@@ -178,6 +183,17 @@ function removerDuasAlternativas() {
   setAlternativasVisiveis(novas);
 }
 
+// Função Dica
+function exibirDica() {
+  if (!usouDica) {
+    setMostrarDica(true);
+    setUsouDica(true);
+  } else {
+    alert('Você já usou a dica nesta partida!');
+  }
+}
+
+
 // Função para reiniciar o jogo
 function reiniciarJogo() {
   setIndicePergunta(0);
@@ -186,6 +202,7 @@ function reiniciarJogo() {
   setParou(false);
   setUsosPular(3);
   setCarregando(true);
+  setUsouDica(false);
 
   axios.get('http://192.168.15.169:5000/quiz')
     .then(response => {
@@ -230,6 +247,13 @@ function reiniciarJogo() {
             
             <Text style={styles.questionText}>{perguntaAtual.pergunta}</Text>
 
+            {mostrarDica && (
+              <Text style={styles.hintText}>
+                💡 Dica: {perguntaAtual.dica}
+              </Text>
+            )}
+
+
             <View style={styles.alternativesContainer}>
               {alternativasVisiveis.map((alt, index) => {
                 const letra = alt.charAt(0);
@@ -270,7 +294,7 @@ function reiniciarJogo() {
                 <Text style={styles.controlText}>Parar</Text>
               </TouchableOpacity>
               
-              <TouchableOpacity style={styles.controlButton}>
+              <TouchableOpacity style={styles.controlButton} onPress={exibirDica}>
                 <Text style={styles.controlText}>Dica</Text>
               </TouchableOpacity>
             
@@ -401,5 +425,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000',
+  },
+  hintText: {
+  fontSize: 16,
+  color: '#FFF',
+  fontStyle: 'italic',
+  marginTop: 10,
+  backgroundColor: 'rgba(255,255,255,0.1)',
+  padding: 10,
+  borderRadius: 10,
   },
 });
