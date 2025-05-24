@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
 import React, { useEffect, useState } from 'react';
 import {TouchableOpacity, ImageBackground,View,Text,StyleSheet,useWindowDimensions,ScrollView,Image, ActivityIndicator} from 'react-native';
 import { useRouter } from 'expo-router';
@@ -14,6 +16,39 @@ interface Pergunta {
 
 export default function QuizScreen() {
   
+  // Música
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const playSound = async () => {
+    try {
+      if (sound && isPlaying) {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null);
+        setIsPlaying(false);
+      } else {
+        const { sound: newSound } = await Audio.Sound.createAsync(
+          require('../../../assets/sound/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3')
+        );
+        setSound(newSound);
+        setIsPlaying(true);
+        await newSound.playAsync();
+
+        // Quando terminar, resetar o estado
+        newSound.setOnPlaybackStatusUpdate((status) => {
+          if (!status.isLoaded) return;
+          if (status.didJustFinish) {
+            setIsPlaying(false);
+            setSound(null);
+          }
+        });
+      }
+    } catch (error) {
+      console.log('Erro ao alternar o som:', error);
+    }
+  };
+
   const router = useRouter();
   const { width } = useWindowDimensions();
 
@@ -138,85 +173,84 @@ export default function QuizScreen() {
   }
 
   if (!perguntaAtual) {
-  return (
-    <View style={styles.centered}>
-      <Text style={{ color: '#FFF' }}>Nenhuma pergunta disponível.</Text>
-      <TouchableOpacity style={styles.controlButton} onPress={() => router.push('/')}>
-        <Text style={styles.controlText}>Voltar ao início</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-//const currentPrize = `R$ ${(indicePergunta + 1) * 1000}`;
-const currentPrize = `R$ ${premios[indicePergunta]?.toLocaleString('pt-BR') || '0'}`;
-
-// Função para parar o jogo
-function pararJogo() {
-  setParou(true);
-  setJogoFinalizado(true);
-}
-
-// Função para Pular uma pergunta 
-function pularPergunta() {
-  if (usosPular > 0 && indicePergunta + 1 < perguntas.length) {
-    setUsosPular(prev => prev - 1);
-    setIndicePergunta(prev => prev + 1);
-  } else {
-    alert('Você não pode mais pular!');
+    return (
+      <View style={styles.centered}>
+        <Text style={{ color: '#FFF' }}>Nenhuma pergunta disponível.</Text>
+        <TouchableOpacity style={styles.controlButton} onPress={() => router.push('/')}>
+          <Text style={styles.controlText}>Voltar ao início</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
-}
 
-// Função para remover duas alternativas
-function removerDuasAlternativas() {
-  const incorretas = alternativasVisiveis.filter(
-    alt => alt.charAt(0).toUpperCase() !== perguntaAtual.correta.charAt(0).toUpperCase()
-  );
+  //const currentPrize = `R$ ${(indicePergunta + 1) * 1000}`;
+  const currentPrize = `R$ ${premios[indicePergunta]?.toLocaleString('pt-BR') || '0'}`;
 
-  const selecionadas = incorretas.sort(() => 0.5 - Math.random()).slice(0, 2);
-
-  const novas = alternativasVisiveis.filter(
-    alt => !selecionadas.includes(alt)
-  );
-
-  setAlternativasVisiveis(novas);
-}
-
-// Função Dica
-function exibirDica() {
-  if (!usouDica) {
-    setMostrarDica(true);
-    setUsouDica(true);
-  } else {
-    alert('Você já usou a dica nesta partida!');
+  // Função para parar o jogo
+  function pararJogo() {
+    setParou(true);
+    setJogoFinalizado(true);
   }
-}
 
+  // Função para Pular uma pergunta 
+  function pularPergunta() {
+    if (usosPular > 0 && indicePergunta + 1 < perguntas.length) {
+      setUsosPular(prev => prev - 1);
+      setIndicePergunta(prev => prev + 1);
+    } else {
+      alert('Você não pode mais pular!');
+    }
+  }
 
-// Função para reiniciar o jogo
-function reiniciarJogo() {
-  setIndicePergunta(0);
-  setPontuacao(0);
-  setJogoFinalizado(false);
-  setParou(false);
-  setUsosPular(1);
-  setCarregando(true);
-  setUsouDica(false);
+  // Função para remover duas alternativas
+  function removerDuasAlternativas() {
+    const incorretas = alternativasVisiveis.filter(
+      alt => alt.charAt(0).toUpperCase() !== perguntaAtual.correta.charAt(0).toUpperCase()
+    );
 
-  axios.get('http://192.168.15.169:5000/quiz')
-    .then(response => {
-      if (Array.isArray(response.data) && response.data.length > 0) {
-        setPerguntas(response.data);
-      } else {
-        console.error('Nenhuma pergunta recebida.');
-      }
-      setCarregando(false);
-    })
-    .catch(error => {
-      console.error('Erro ao carregar perguntas:', error);
-      setCarregando(false);
-    });
-}
+    const selecionadas = incorretas.sort(() => 0.5 - Math.random()).slice(0, 2);
+
+    const novas = alternativasVisiveis.filter(
+      alt => !selecionadas.includes(alt)
+    );
+
+    setAlternativasVisiveis(novas);
+  }
+
+  // Função Dica
+  function exibirDica() {
+    if (!usouDica) {
+      setMostrarDica(true);
+      setUsouDica(true);
+    } else {
+      alert('Você já usou a dica nesta partida!');
+    }
+  }
+
+  // Função para reiniciar o jogo
+  function reiniciarJogo() {
+    setIndicePergunta(0);
+    setPontuacao(0);
+    setJogoFinalizado(false);
+    setParou(false);
+    setUsosPular(1);
+    setCarregando(true);
+    setUsouDica(false);
+
+    axios.get('http://192.168.15.169:5000/quiz')
+      .then(response => {
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setPerguntas(response.data);
+        } else {
+          console.error('Nenhuma pergunta recebida.');
+        }
+        setCarregando(false);
+      })
+      .catch(error => {
+        console.error('Erro ao carregar perguntas:', error);
+        setCarregando(false);
+      });
+  }
 
 
   return (
@@ -227,6 +261,12 @@ function reiniciarJogo() {
         style={styles.container}
         resizeMode="cover"
       >
+        <TouchableOpacity
+          style={[styles.soundIcon, width > 768 && styles.soundIconDesktop]}
+          onPress={playSound}
+>
+          <Ionicons name="volume-high" size={30} color="white" />
+        </TouchableOpacity>
 
         <View style={[styles.overlay, width > 768 && styles.overlayDesktop]}>
           
@@ -433,5 +473,17 @@ const styles = StyleSheet.create({
   backgroundColor: 'rgba(255,255,255,0.1)',
   padding: 5,
   borderRadius: 10,
+  },
+  soundIcon: {
+    position: 'absolute',
+    top: 40,
+    right: 30,
+    zIndex: 5,
+  },
+  soundIconDesktop: {
+    position: 'absolute',
+    top: 40,
+    right: 40,
+    zIndex: 5,
   },
 });
