@@ -10,7 +10,8 @@ export default function EditarPerguntaScreen() {
   const [dificuldade, setDificuldade] = useState('');
   const [alternativaCorreta, setAlternativaCorreta] = useState('');
   const [dica, setDica] = useState('');
-  //const [id, setId] = useState('');
+  const [serie, setSerie] = useState('');
+
 
   type LetraAlternativa = 'A' | 'B' | 'C' | 'D';
   const [alternativas, setAlternativas] = useState<Record<LetraAlternativa, string>>({
@@ -22,6 +23,7 @@ export default function EditarPerguntaScreen() {
 
   const handleSalvar = async () => {
   if (
+    !serie ||
     !pergunta ||
     !alternativas.A ||
     !alternativas.B ||
@@ -49,8 +51,19 @@ export default function EditarPerguntaScreen() {
     dica: dica
   };
 
+  // Rotas para salvar as perguntas em diferentes bancos conforme a série
+  let url = '';
+
+  if (serie === '1') {
+    url = 'http://192.168.15.169:5000/perguntas';
+  } else if (serie === '2') {
+    url = 'http://192.168.15.169:5000/perguntas2';
+  } else {
+    url = 'http://192.168.15.169:5000/perguntas3';
+  }
+
   try {
-    await axios.post('http://192.168.15.169:5000/perguntas', data);
+    await axios.post(url, data);
     alert('Pergunta salva com sucesso!');
     // Reiniciar após salvar
     setDificuldade('');
@@ -63,6 +76,7 @@ export default function EditarPerguntaScreen() {
     });
     setAlternativaCorreta('');
     setDica('');
+    setSerie('');
     } catch (error) {
       console.error(error);
       alert('Erro ao salvar a pergunta');
@@ -116,7 +130,7 @@ export default function EditarPerguntaScreen() {
 
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '90%', marginTop: 10 }}>
-          <View style={{ width: '45%' }}>
+          <View style={{ width: '30%' }}>
               <Text style={styles.label}>Dificuldade:</Text>
               <View style={styles.pickerContainer}>
                   <Picker
@@ -134,8 +148,8 @@ export default function EditarPerguntaScreen() {
               </View>
           </View>
             
-          <View style={{ width: '45%' }}>
-            <Text style={styles.label}>Alternativa Correta:</Text>
+          <View style={{ width: '30%' }}>
+            <Text style={styles.label}>Alternativa:</Text>
             <View style={styles.pickerContainer}>
                 <Picker
                 selectedValue={alternativaCorreta}
@@ -152,12 +166,12 @@ export default function EditarPerguntaScreen() {
             </View>
           </View>
 
-          {/* <View style={{ width: '30%' }}>
+          <View style={{ width: '30%' }}>
             <Text style={styles.label}>Série:</Text>
             <View style={styles.pickerContainer}>
                 <Picker
-                selectedValue={alternativaCorreta}
-                onValueChange={(itemValue) => setAlternativaCorreta(itemValue)}
+                selectedValue={serie}
+                onValueChange={(itemValue) => setSerie(itemValue)}
                 dropdownIconColor="white"
                 style={styles.picker}
                 >
@@ -167,7 +181,7 @@ export default function EditarPerguntaScreen() {
                 <Picker.Item label="3ª Série" value="3" />
                 </Picker>
             </View>
-          </View> */}
+          </View>
         </View>
 
           <TouchableOpacity style={styles.saveButton} onPress={handleSalvar}>

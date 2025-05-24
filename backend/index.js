@@ -69,10 +69,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => {
-  res.send('Servidor backend está rodando!');
-});
-
 // Modelo de Pergunta
 const PerguntaSchema = new mongoose.Schema({
   nivel: String,
@@ -82,8 +78,10 @@ const PerguntaSchema = new mongoose.Schema({
   dica: String
 });
 const Pergunta = mongoose.model('Pergunta', PerguntaSchema, 'questoes'); // nome da coleção
+const Pergunta2 = mongoose.model('Pergunta2', PerguntaSchema, 'questoes2');
+const Pergunta3 = mongoose.model('Pergunta3', PerguntaSchema, 'questoes3');
 
-// Rota GET /quiz
+// Rota GET /quiz (1 serie)
 app.get('/quiz', async (req, res) => {
   try {
     const faceis = await Pergunta.aggregate([{ $match: { nivel: 'facil' } }, { $sample: { size: 3 } }]);
@@ -146,7 +144,27 @@ app.post('/perguntas', async (req, res) => {
   }
 });
 
+app.post('/perguntas2', async (req, res) => {
+  try {
+    const novaPergunta = new Pergunta2(req.body);
+    const perguntaSalva = await novaPergunta.save();
+    res.status(201).json(perguntaSalva);
+  } catch (err) {
+    console.error('Erro ao salvar pergunta da série 2:', err);
+    res.status(500).json({ error: 'Erro ao salvar pergunta da série 2' });
+  }
+});
 
+app.post('/perguntas3', async (req, res) => {
+  try {
+    const novaPergunta = new Pergunta3(req.body);
+    const perguntaSalva = await novaPergunta.save();
+    res.status(201).json(perguntaSalva);
+  } catch (err) {
+    console.error('Erro ao salvar pergunta da série 3:', err);
+    res.status(500).json({ error: 'Erro ao salvar pergunta da série 3' });
+  }
+});
 
 // Servidor rodando (Rota de Teste)
 app.get('/', (req, res) => {
