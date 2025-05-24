@@ -7,21 +7,18 @@ export default function EditarPerguntaScreen() {
   const { width } = useWindowDimensions();
 
   const [pergunta, setPergunta] = useState('');
-  
-  type LetraAlternativa = 'A' | 'B' | 'C' | 'D';
-
-    const [alternativas, setAlternativas] = useState<Record<LetraAlternativa, string>>({
-    A: '',
-    B: '',
-    C: '',
-    D: '',
-    });
-
   const [dificuldade, setDificuldade] = useState('');
   const [alternativaCorreta, setAlternativaCorreta] = useState('');
   const [dica, setDica] = useState('');
-
   //const [id, setId] = useState('');
+
+  type LetraAlternativa = 'A' | 'B' | 'C' | 'D';
+  const [alternativas, setAlternativas] = useState<Record<LetraAlternativa, string>>({
+  A: '',
+  B: '',
+  C: '',
+  D: '',
+  });
 
   const handleSalvar = async () => {
   if (
@@ -31,7 +28,8 @@ export default function EditarPerguntaScreen() {
     !alternativas.C ||
     !alternativas.D ||
     !dificuldade ||
-    !alternativaCorreta
+    !alternativaCorreta ||
+    !dica
   ) {
     alert('Preencha todos os campos!');
     return;
@@ -65,23 +63,23 @@ export default function EditarPerguntaScreen() {
     });
     setAlternativaCorreta('');
     setDica('');
-  } catch (error) {
-    console.error(error);
-    alert('Erro ao salvar a pergunta');
-  }
-};
-
-
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao salvar a pergunta');
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      
       <ImageBackground
         source={require('../../../assets/images/TelaAzul.png')}
         style={styles.container}
         resizeMode="cover"
       >
+        
         <View style={[styles.overlay, width > 768 && styles.overlayDesktop]}>
-          <Text style={styles.title}>EDITAR PERGUNTA:</Text>
+          <Text style={styles.title}>ADICIONAR PERGUNTA:</Text>
 
           <Text style={styles.label}>Pergunta:</Text>
           <TextInput
@@ -101,77 +99,76 @@ export default function EditarPerguntaScreen() {
             placeholderTextColor="#fff"
           />
 
-    {(['A', 'B', 'C', 'D'] as LetraAlternativa[]).map((letra) => (
-        <View key={letra} style={{width: '60%'}}>
-            <Text style={styles.label}>Alternativa {letra}:</Text>
-            <TextInput
-                style={styles.alternativaInput}
-                value={alternativas[letra]}
-                onChangeText={(text) =>
-                    setAlternativas((prev) => ({ ...prev, [letra]: text }))
-                }
-                placeholder={`Digite a alternativa ${letra}`}
-                placeholderTextColor="#fff"
-            />
-        </View>
-    ))}
+        {(['A', 'B', 'C', 'D'] as LetraAlternativa[]).map((letra) => (
+            <View key={letra} style={{width: '60%'}}>
+                <Text style={styles.label}>Alternativa {letra}:</Text>
+                <TextInput
+                    style={styles.alternativaInput}
+                    value={alternativas[letra]}
+                    onChangeText={(text) =>
+                        setAlternativas((prev) => ({ ...prev, [letra]: text }))
+                    }
+                    placeholder={`Digite a alternativa ${letra}`}
+                    placeholderTextColor="#fff"
+                />
+            </View>
+        ))}
 
 
-
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '90%', marginTop: 10 }}>
-        <View style={{ width: '45%' }}>
-            <Text style={styles.label}>Dificuldade:</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '90%', marginTop: 10 }}>
+          <View style={{ width: '45%' }}>
+              <Text style={styles.label}>Dificuldade:</Text>
+              <View style={styles.pickerContainer}>
+                  <Picker
+                  selectedValue={dificuldade}
+                  onValueChange={(itemValue) => setDificuldade(itemValue)}
+                  dropdownIconColor="white"
+                  style={styles.picker}
+                  >
+                  <Picker.Item label="Selecione..." value="" />
+                  <Picker.Item label="Fácil" value="facil" />
+                  <Picker.Item label="Médio" value="medio" />
+                  <Picker.Item label="Difícil" value="dificil" />
+                  <Picker.Item label="Muito Difícil" value="muito_dificil" />
+                  </Picker>
+              </View>
+          </View>
+            
+          <View style={{ width: '45%' }}>
+            <Text style={styles.label}>Alternativa Correta:</Text>
             <View style={styles.pickerContainer}>
                 <Picker
-                selectedValue={dificuldade}
-                onValueChange={(itemValue) => setDificuldade(itemValue)}
+                selectedValue={alternativaCorreta}
+                onValueChange={(itemValue) => setAlternativaCorreta(itemValue)}
                 dropdownIconColor="white"
                 style={styles.picker}
                 >
                 <Picker.Item label="Selecione..." value="" />
-                <Picker.Item label="Fácil" value="facil" />
-                <Picker.Item label="Médio" value="medio" />
-                <Picker.Item label="Difícil" value="dificil" />
-                <Picker.Item label="Muito Difícil" value="muito_dificil" />
+                <Picker.Item label="A" value="A" />
+                <Picker.Item label="B" value="B" />
+                <Picker.Item label="C" value="C" />
+                <Picker.Item label="D" value="D" />
                 </Picker>
             </View>
-        </View>
-          
-        <View style={{ width: '45%' }}>
-          <Text style={styles.label}>Alternativa Correta:</Text>
-          <View style={styles.pickerContainer}>
-              <Picker
-              selectedValue={alternativaCorreta}
-              onValueChange={(itemValue) => setAlternativaCorreta(itemValue)}
-              dropdownIconColor="white"
-              style={styles.picker}
-              >
-              <Picker.Item label="Selecione..." value="" />
-              <Picker.Item label="A" value="A" />
-              <Picker.Item label="B" value="B" />
-              <Picker.Item label="C" value="C" />
-              <Picker.Item label="D" value="D" />
-              </Picker>
           </View>
-        </View>
 
-        {/* <View style={{ width: '30%' }}>
-          <Text style={styles.label}>Série:</Text>
-          <View style={styles.pickerContainer}>
-              <Picker
-              selectedValue={alternativaCorreta}
-              onValueChange={(itemValue) => setAlternativaCorreta(itemValue)}
-              dropdownIconColor="white"
-              style={styles.picker}
-              >
-              <Picker.Item label="Selecione..." value="" />
-              <Picker.Item label="1ª Série" value="1" />
-              <Picker.Item label="2ª Série" value="2" />
-              <Picker.Item label="3ª Série" value="3" />
-              </Picker>
-          </View>
-        </View> */}
-      </View>
+          {/* <View style={{ width: '30%' }}>
+            <Text style={styles.label}>Série:</Text>
+            <View style={styles.pickerContainer}>
+                <Picker
+                selectedValue={alternativaCorreta}
+                onValueChange={(itemValue) => setAlternativaCorreta(itemValue)}
+                dropdownIconColor="white"
+                style={styles.picker}
+                >
+                <Picker.Item label="Selecione..." value="" />
+                <Picker.Item label="1ª Série" value="1" />
+                <Picker.Item label="2ª Série" value="2" />
+                <Picker.Item label="3ª Série" value="3" />
+                </Picker>
+            </View>
+          </View> */}
+        </View>
 
           <TouchableOpacity style={styles.saveButton} onPress={handleSalvar}>
             <Text style={styles.saveButtonText}>Salvar</Text>
