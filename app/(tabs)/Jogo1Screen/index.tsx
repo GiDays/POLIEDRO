@@ -12,6 +12,7 @@ interface Pergunta {
 }
 
 export default function QuizScreen() {
+  
   const router = useRouter();
   const { width } = useWindowDimensions();
 
@@ -60,7 +61,7 @@ export default function QuizScreen() {
       console.error('Erro ao carregar perguntas:', error);
       setCarregando(false);
     });
-}, []);
+  }, []);
 
   // Função de cálculo de patamar
   function calcularPatamar(indice: any) {
@@ -109,7 +110,7 @@ export default function QuizScreen() {
   if (jogoFinalizado) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.prizeText}>Jogo finalizado!</Text>
+        <Text style={styles.prizeText}>Parabéns!</Text>
         <Text style={styles.prizeText}>
           {parou ? "Você parou e ganhou: " : "Você ganhou: "} R$ {premioFinal.toLocaleString('pt-BR')}
         </Text>
@@ -122,7 +123,6 @@ export default function QuizScreen() {
       </View>
     );
   }
-
 
   if (carregando) {
     return (
@@ -201,7 +201,6 @@ function reiniciarJogo() {
       setCarregando(false);
     });
 }
-
 
 
   return (
