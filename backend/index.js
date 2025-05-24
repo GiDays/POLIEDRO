@@ -102,6 +102,27 @@ app.get('/quiz', async (req, res) => {
   }
 });
 
+// Rota GET /quiz (2 serie)
+app.get('/quiz2', async (req, res) => {
+  try {
+    const faceis = await Pergunta2.aggregate([{ $match: { nivel: 'facil' } }, { $sample: { size: 3 } }]);
+    console.log('Faceis:', faceis);
+    const medias = await Pergunta2.aggregate([{ $match: { nivel: 'medio' } }, { $sample: { size: 3 } }]);
+    console.log('Medias:', medias);
+    const dificeis = await Pergunta2.aggregate([{ $match: { nivel: 'dificil' } }, { $sample: { size: 3 } }]);
+    console.log('Dificeis:', dificeis);
+    const muitoDificil = await Pergunta2.aggregate([{ $match: { nivel: 'muito_dificil' } }, { $sample: { size: 1 } }]);
+    console.log('Muito Dificil:', muitoDificil);
+    
+    const perguntas = [...faceis, ...medias, ...dificeis, ...muitoDificil];
+    console.log('Perguntas totais:', perguntas.length);
+
+    res.json(perguntas);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Modelo de Editar Pergunta
 // Atualizar pergunta
 // app.put('/perguntas/:id', async (req, res) => {
