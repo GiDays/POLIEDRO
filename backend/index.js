@@ -73,6 +73,41 @@ app.get('/', (req, res) => {
   res.send('Servidor backend está rodando!');
 });
 
+// Modelo de Pergunta
+const PerguntaSchema = new mongoose.Schema({
+  nivel: String,
+  pergunta: String,
+  alternativas: [String],
+  correta: String
+});
+const Pergunta = mongoose.model('Pergunta', PerguntaSchema, 'questoes'); // nome da coleção
+
+// Rota GET /quiz
+app.get('/quiz', async (req, res) => {
+  try {
+    const faceis = await Pergunta.aggregate([{ $match: { nivel: 'facil' } }, { $sample: { size: 3 } }]);
+    console.log('Faceis:', faceis);
+    const medias = await Pergunta.aggregate([{ $match: { nivel: 'medio' } }, { $sample: { size: 3 } }]);
+    console.log('Medias:', medias);
+    const dificeis = await Pergunta.aggregate([{ $match: { nivel: 'dificil' } }, { $sample: { size: 3 } }]);
+    console.log('Dificeis:', dificeis);
+    const muitoDificil = await Pergunta.aggregate([{ $match: { nivel: 'muito_dificil' } }, { $sample: { size: 1 } }]);
+    console.log('Muito Dificil:', muitoDificil);
+    
+    const perguntas = [...faceis, ...medias, ...dificeis, ...muitoDificil];
+    console.log('Perguntas totais:', perguntas.length);
+
+    res.json(perguntas);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Servidor rodando
+app.get('/', (req, res) => {
+  res.send('Servidor backend está rodando!');
+});
+
 // Conexão com MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Atlas conectado'))

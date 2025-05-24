@@ -12,7 +12,7 @@ export default function StartScreen() {
   };
 
   const handleEditar = () => {
-    router.push('../(tabs)/EditarScreen/index');
+    router.push('../(tabs)/EditarScreen');
   };
 
   const handleHistory = () => {
