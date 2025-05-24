@@ -62,6 +62,13 @@ export default function QuizScreen() {
     });
 }, []);
 
+  // Função de cálculo de patamar
+  function calcularPatamar(indice: any) {
+    if (indice >= 7) return premios[6]; // R$50.000
+    if (indice >= 4) return premios[4]; // R$10.000
+    return 0;
+  }
+
   // Lógica do Jogo
   function responder(letraSelecionada: string) {
   const perguntaAtual = perguntas[indicePergunta];
@@ -85,22 +92,27 @@ export default function QuizScreen() {
   }
   }
 
-  if (carregando) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" />
-        <Text style={{ color: '#FFF' }}>Carregando perguntas...</Text>
-      </View>
-    );
-  }
-
   let premioFinal = 0;
+
+  if (parou) {
+    premioFinal = premios[indicePergunta - 1] || 0;
+  } else if (jogoFinalizado) {
+    if (pontuacao === perguntas.length) {
+      // Acertou tudo!
+      premioFinal = premios[premios.length - 1];
+    } else {
+      // Errou
+      premioFinal = calcularPatamar(indicePergunta);
+    }
+  }
 
   if (jogoFinalizado) {
     return (
       <View style={styles.centered}>
         <Text style={styles.prizeText}>Jogo finalizado!</Text>
-        <Text style={styles.prizeText}> {parou ? "Você parou e ganhou: " : "Você ganhou: "} R$ {premioFinal.toLocaleString('pt-BR')}</Text>
+        <Text style={styles.prizeText}>
+          {parou ? "Você parou e ganhou: " : "Você ganhou: "} R$ {premioFinal.toLocaleString('pt-BR')}
+        </Text>
         <TouchableOpacity style={styles.controlButton} onPress={() => router.push('../../(tabs)/HomeScreen')}>
           <Text style={styles.controlText}>Jogar Novamente</Text>
         </TouchableOpacity>
@@ -108,14 +120,14 @@ export default function QuizScreen() {
     );
   }
 
-  if (parou || jogoFinalizado) {
-    if (parou) {
-      premioFinal = premios[indicePergunta - 1] || 0;
-    } else {
-      if (pontuacao >= 8) premioFinal = 50000;
-      else if (pontuacao >= 5) premioFinal = 10000;
-      else premioFinal = 0;
-    }
+
+  if (carregando) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" />
+        <Text style={{ color: '#FFF' }}>Carregando perguntas...</Text>
+      </View>
+    );
   }
 
   if (!perguntaAtual) {
