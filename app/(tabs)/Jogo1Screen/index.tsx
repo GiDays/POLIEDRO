@@ -23,6 +23,7 @@ export default function QuizScreen() {
   const [parou, setParou] = useState(false); // Parar o jogo 
   const [usosPular, setUsosPular] = useState(3); // Pular pergunta
   const [alternativasVisiveis, setAlternativasVisiveis] = useState<string[]>([]); // -2 alternativas
+  const perguntaAtual = perguntas[indicePergunta];
 
   const premios = [
     1000,     // Pergunta 1 - fácil
@@ -42,7 +43,7 @@ export default function QuizScreen() {
   if (perguntaAtual) {
     setAlternativasVisiveis(perguntaAtual.alternativas);
   }
-  }, [indicePergunta]);
+  }, [indicePergunta, perguntas]);
 
   // Conexão perguntas
   useEffect(() => {
@@ -59,7 +60,7 @@ export default function QuizScreen() {
       console.error('Erro ao carregar perguntas:', error);
       setCarregando(false);
     });
-  }, []);
+}, []);
 
   // Lógica do Jogo
   function responder(letraSelecionada: string) {
@@ -83,8 +84,6 @@ export default function QuizScreen() {
     setJogoFinalizado(true);
   }
   }
-
-  const perguntaAtual = perguntas[indicePergunta];
 
   if (carregando) {
     return (
@@ -151,15 +150,19 @@ function pularPergunta() {
 
 // Função para remover duas alternativas
 function removerDuasAlternativas() {
-  const incorretas = alternativasVisiveis.filter(alt => alt.charAt(0).toUpperCase() !== perguntaAtual.correta.charAt(0).toUpperCase());
-  
-  if (incorretas.length > 2) {
-    const novas = alternativasVisiveis.filter(alt => {
-      return alt === perguntaAtual.correta || incorretas.indexOf(alt) > 1;
-    });
-    setAlternativasVisiveis(novas);
-  }
+  const incorretas = alternativasVisiveis.filter(
+    alt => alt.charAt(0).toUpperCase() !== perguntaAtual.correta.charAt(0).toUpperCase()
+  );
+
+  const selecionadas = incorretas.sort(() => 0.5 - Math.random()).slice(0, 2);
+
+  const novas = alternativasVisiveis.filter(
+    alt => !selecionadas.includes(alt)
+  );
+
+  setAlternativasVisiveis(novas);
 }
+
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
