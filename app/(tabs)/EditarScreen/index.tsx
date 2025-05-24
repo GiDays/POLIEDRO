@@ -54,6 +54,17 @@ export default function EditarPerguntaScreen() {
   try {
     await axios.post('http://192.168.15.169:5000/perguntas', data);
     alert('Pergunta salva com sucesso!');
+    // Reiniciar após salvar
+    setDificuldade('');
+    setPergunta('');
+    setAlternativas({
+      A: '',
+      B: '',
+      C: '',
+      D: ''
+    });
+    setAlternativaCorreta('');
+    setDica('');
   } catch (error) {
     console.error(error);
     alert('Erro ao salvar a pergunta');
