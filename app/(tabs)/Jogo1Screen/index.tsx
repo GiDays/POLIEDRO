@@ -113,9 +113,12 @@ export default function QuizScreen() {
         <Text style={styles.prizeText}>
           {parou ? "Você parou e ganhou: " : "Você ganhou: "} R$ {premioFinal.toLocaleString('pt-BR')}
         </Text>
-        <TouchableOpacity style={styles.controlButton} onPress={() => router.push('../../(tabs)/HomeScreen')}>
+        
+        <TouchableOpacity style={styles.controlButton} onPress={() => {reiniciarJogo();
+        router.replace('../../(tabs)/HomeScreen');}}>
           <Text style={styles.controlText}>Jogar Novamente</Text>
         </TouchableOpacity>
+      
       </View>
     );
   }
@@ -174,6 +177,31 @@ function removerDuasAlternativas() {
 
   setAlternativasVisiveis(novas);
 }
+
+// Função para reiniciar o jogo
+function reiniciarJogo() {
+  setIndicePergunta(0);
+  setPontuacao(0);
+  setJogoFinalizado(false);
+  setParou(false);
+  setUsosPular(3);
+  setCarregando(true);
+
+  axios.get('http://192.168.15.169:5000/quiz')
+    .then(response => {
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        setPerguntas(response.data);
+      } else {
+        console.error('Nenhuma pergunta recebida.');
+      }
+      setCarregando(false);
+    })
+    .catch(error => {
+      console.error('Erro ao carregar perguntas:', error);
+      setCarregando(false);
+    });
+}
+
 
 
   return (
