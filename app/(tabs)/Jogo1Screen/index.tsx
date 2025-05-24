@@ -90,8 +90,8 @@ export default function QuizScreen() {
       <View style={styles.centered}>
         <Text style={styles.prizeText}>Jogo finalizado!</Text>
         <Text style={styles.prizeText}>Sua pontuação: {pontuacao} / {perguntas.length}</Text>
-        <TouchableOpacity style={styles.controlButton} onPress={() => router.push('/')}>
-          <Text style={styles.controlText}>Voltar ao início</Text>
+        <TouchableOpacity style={styles.controlButton} onPress={() => router.push('../../(tabs)/HomeScreen')}>
+          <Text style={styles.controlText}>Jogar Novamente</Text>
         </TouchableOpacity>
       </View>
     );
