@@ -3,6 +3,7 @@ import {TouchableOpacity, ImageBackground,View,Text,StyleSheet,useWindowDimensio
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 
+// Estrutura da pergunta
 interface Pergunta {
   pergunta: string;
   alternativas: string[];
@@ -19,6 +20,9 @@ export default function QuizScreen() {
   const [pontuacao, setPontuacao] = useState(0);
   const [jogoFinalizado, setJogoFinalizado] = useState(false);
   const [carregando, setCarregando] = useState(true);
+  const [parou, setParou] = useState(false); // Parar o jogo 
+  const [usosPular, setUsosPular] = useState(3); // Pular pergunta
+  const [alternativasVisiveis, setAlternativasVisiveis] = useState<string[]>([]); // -2 alternativas
 
   const premios = [
     1000,     // Pergunta 1 - fácil
@@ -33,6 +37,14 @@ export default function QuizScreen() {
     1000000   // Pergunta 10 - muito difícil
   ];
 
+  // -2 alternativas
+  useEffect(() => {
+  if (perguntaAtual) {
+    setAlternativasVisiveis(perguntaAtual.alternativas);
+  }
+  }, [indicePergunta]);
+
+  // Conexão perguntas
   useEffect(() => {
   axios.get('http://192.168.15.169:5000/quiz')
     .then(response => {
@@ -47,13 +59,12 @@ export default function QuizScreen() {
       console.error('Erro ao carregar perguntas:', error);
       setCarregando(false);
     });
-}, []);
+  }, []);
 
-
+  // Lógica do Jogo
   function responder(letraSelecionada: string) {
   const perguntaAtual = perguntas[indicePergunta];
 
-  // Pega só a letra maiúscula da resposta correta e da selecionada
   const correta = perguntaAtual.correta.charAt(0).toUpperCase();
   const selecionada = letraSelecionada.toUpperCase();
 
@@ -73,7 +84,6 @@ export default function QuizScreen() {
   }
   }
 
-
   const perguntaAtual = perguntas[indicePergunta];
 
   if (carregando) {
@@ -85,16 +95,28 @@ export default function QuizScreen() {
     );
   }
 
+  let premioFinal = 0;
+
   if (jogoFinalizado) {
     return (
       <View style={styles.centered}>
         <Text style={styles.prizeText}>Jogo finalizado!</Text>
-        <Text style={styles.prizeText}>Sua pontuação: {pontuacao} / {perguntas.length}</Text>
+        <Text style={styles.prizeText}> {parou ? "Você parou e ganhou: " : "Você ganhou: "} R$ {premioFinal.toLocaleString('pt-BR')}</Text>
         <TouchableOpacity style={styles.controlButton} onPress={() => router.push('../../(tabs)/HomeScreen')}>
           <Text style={styles.controlText}>Jogar Novamente</Text>
         </TouchableOpacity>
       </View>
     );
+  }
+
+  if (parou || jogoFinalizado) {
+    if (parou) {
+      premioFinal = premios[indicePergunta - 1] || 0;
+    } else {
+      if (pontuacao >= 8) premioFinal = 50000;
+      else if (pontuacao >= 5) premioFinal = 10000;
+      else premioFinal = 0;
+    }
   }
 
   if (!perguntaAtual) {
@@ -111,6 +133,33 @@ export default function QuizScreen() {
 //const currentPrize = `R$ ${(indicePergunta + 1) * 1000}`;
 const currentPrize = `R$ ${premios[indicePergunta]?.toLocaleString('pt-BR') || '0'}`;
 
+// Função para parar o jogo
+function pararJogo() {
+  setParou(true);
+  setJogoFinalizado(true);
+}
+
+// Função para Pular uma pergunta 
+function pularPergunta() {
+  if (usosPular > 0 && indicePergunta + 1 < perguntas.length) {
+    setUsosPular(prev => prev - 1);
+    setIndicePergunta(prev => prev + 1);
+  } else {
+    alert('Você não pode mais pular!');
+  }
+}
+
+// Função para remover duas alternativas
+function removerDuasAlternativas() {
+  const incorretas = alternativasVisiveis.filter(alt => alt.charAt(0).toUpperCase() !== perguntaAtual.correta.charAt(0).toUpperCase());
+  
+  if (incorretas.length > 2) {
+    const novas = alternativasVisiveis.filter(alt => {
+      return alt === perguntaAtual.correta || incorretas.indexOf(alt) > 1;
+    });
+    setAlternativasVisiveis(novas);
+  }
+}
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
@@ -140,10 +189,9 @@ const currentPrize = `R$ ${premios[indicePergunta]?.toLocaleString('pt-BR') || '
             <Text style={styles.questionText}>{perguntaAtual.pergunta}</Text>
 
             <View style={styles.alternativesContainer}>
-              {perguntaAtual.alternativas.map((alt, index) => {
+              {alternativasVisiveis.map((alt, index) => {
                 const letra = alt.charAt(0);
                 return (
-                
                   <TouchableOpacity
                     key={index}
                     style={[
@@ -153,10 +201,10 @@ const currentPrize = `R$ ${premios[indicePergunta]?.toLocaleString('pt-BR') || '
                     onPress={() => responder(letra)}
                   >
                     <Text style={styles.alternativeText}>{alt}</Text>
-
                   </TouchableOpacity>
-              );
-            })}
+                );
+              })}
+
             </View>
 
           </View>
@@ -168,15 +216,15 @@ const currentPrize = `R$ ${premios[indicePergunta]?.toLocaleString('pt-BR') || '
 
             <View style={styles.controlsRow}>
               
-              <TouchableOpacity style={styles.controlButton}>
+              <TouchableOpacity style={styles.controlButton} onPress={pularPergunta}>
                 <Text style={styles.controlText}>Pular</Text>
               </TouchableOpacity>
               
-              <TouchableOpacity style={styles.controlButton}>
+              <TouchableOpacity style={styles.controlButton} onPress={removerDuasAlternativas}>
                 <Text style={styles.controlText}>-2 Alternativas</Text>
               </TouchableOpacity>
               
-              <TouchableOpacity style={styles.controlButton}>
+              <TouchableOpacity style={styles.controlButton} onPress={pararJogo}>
                 <Text style={styles.controlText}>Parar</Text>
               </TouchableOpacity>
               
