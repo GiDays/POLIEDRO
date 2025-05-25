@@ -144,29 +144,6 @@ app.get('/quiz3', async (req, res) => {
   }
 });
 
-// Modelo de Editar Pergunta
-// Atualizar pergunta
-// app.put('/perguntas/:id', async (req, res) => {
-//   try {
-//     const { pergunta, alternativas, correta, nivel, dica } = req.body;
-
-//     const perguntaAtualizada = await Pergunta.findByIdAndUpdate(
-//       req.params.id,
-//       { pergunta, alternativas, correta, nivel, dica },
-//       { new: true }
-//     );
-
-//     if (!perguntaAtualizada) {
-//       return res.status(404).json({ message: 'Pergunta não encontrada' });
-//     }
-
-//     res.json(perguntaAtualizada);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: 'Erro ao atualizar a pergunta' });
-//   }
-// });
-
 // Salvar nova pergunta
 app.post('/perguntas', async (req, res) => {
   try {
@@ -205,6 +182,35 @@ app.post('/perguntas3', async (req, res) => {
   } catch (err) {
     console.error('Erro ao salvar pergunta da série 3:', err);
     res.status(500).json({ error: 'Erro ao salvar pergunta da série 3' });
+  }
+});
+
+// Lógica do Histórico
+const partidaSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  pontuacao: { type: Number, required: true },
+  data: { type: Date, default: Date.now },
+  perguntasRespondidas: [{ pergunta: String, respostaUsuario: String, correta: String }]
+});
+const Partida = mongoose.model('Partida', partidaSchema, 'tentativas');
+
+app.post('/partidas', async (req, res) => {
+  const { email, pontuacao, perguntasRespondidas } = req.body;
+  try {
+    const novaPartida = new Partida({ email, pontuacao, perguntasRespondidas });
+    await novaPartida.save();
+    res.status(201).json({ message: 'Partida salva com sucesso!' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao salvar partida' });
+  }
+});
+
+app.get('/partidas/:email', async (req, res) => {
+  try {
+    const partidas = await Partida.find({ email: req.params.email }).sort({ data: -1 });
+    res.json(partidas);
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao buscar histórico' });
   }
 });
 
