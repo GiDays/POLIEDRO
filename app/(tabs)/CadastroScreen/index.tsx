@@ -1,90 +1,101 @@
-import { Dimensions } from 'react-native';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import {TextInput,TouchableOpacity,ImageBackground,Image,View,Text,StyleSheet,useWindowDimensions,ScrollView,Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { Audio } from 'expo-av';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, Dimensions, Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-// Declara componete funcional (CadastroUsuário)
 export default function CadastroUsuario() {
-
-  // Dimensões da Tela
   const { width } = Dimensions.get('window');
-
-  // Métodos para navegar entre as telas
   const router = useRouter();
 
-  // Cria estados com string vazia para armazenar os valores digitados pelos usuários
   const [email, setEmail] = useState('');
   const [nome, setNome] = useState('');
   const [senha, setSenha] = useState('');
 
-  // Função que será chamada quando clicar no botão "Finalizar Cadastro"
-  const handleFinalizarCadastro = async () => {
-    
-    // Teste de valores:
-    // alert('email e senha:' + email + nome + senha);
+  // Corrige modo de reprodução de som
+  useEffect(() => {
+    Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      staysActiveInBackground: false,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+      interruptionModeAndroid: 1, // DO_NOT_MIX
+      interruptionModeIOS: 1,     // DO_NOT_MIX
+    });
+  }, []);
 
+  // Estado e função para música
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const playSound = async () => {
+    try {
+      if (sound && isPlaying) {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null);
+        setIsPlaying(false);
+      } else {
+        const { sound: newSound } = await Audio.Sound.createAsync(
+          require('../../../assets/sound/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3')
+        );
+        setSound(newSound);
+        setIsPlaying(true);
+        await newSound.playAsync();
+
+        newSound.setOnPlaybackStatusUpdate((status) => {
+          if (!status.isLoaded) return;
+          if (status.didJustFinish) {
+            setIsPlaying(false);
+            setSound(null);
+          }
+        });
+      }
+    } catch (error) {
+      console.log('Erro ao reproduzir o som:', error);
+    }
+  };
+
+  const handleFinalizarCadastro = async () => {
     if (!email || !senha) {
       Alert.alert('Erro', 'Preencha todos os campos!');
       return;
     }
 
     try {
-      // Teste:
-      // alert('email e senha:' + email + senha);
+      const response = await axios.post('http://192.168.15.169:5000/registro', {
+        email, senha, nome
+      });
 
-      //Fetch para a requisição HTTP, Post para enviar os dados, await para esperar a resposta
-      const response = await axios.post('http://192.168.15.169:5000/registro', {email, senha, nome});
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, senha, nome })
-      // });
-
-      // const data = await response.json();
-
-      // if (response.ok) {
-      //   Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-      //   router.push('../(tabs)/HomeScreen');
-      // } else {
-      //   Alert.alert('Erro', data.error || 'Erro ao cadastrar');
-      // }
-      
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
       router.push('../(tabs)/HomeScreen');
-  //   
-  } catch (error) {
-  const err = error as any;
-  Alert.alert('Erro', err.response?.data?.error || 'Não foi possível se conectar ao servidor.');
-  }
-};
-
+    } catch (error) {
+      const err = error as any;
+      Alert.alert('Erro', err.response?.data?.error || 'Não foi possível se conectar ao servidor.');
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
-      
       <ImageBackground
         source={require('../../../assets/images/TelaAzul.png')}
         style={styles.container}
         resizeMode="cover"
       >
-
         {/* Seta de voltar */}
         <TouchableOpacity style={[styles.backIcon, width > 768 && styles.backIconDesktop]} onPress={() => router.push('../(tabs)')}>
           <Ionicons name="arrow-back" size={30} color="white" />
         </TouchableOpacity>
-        
-        {/* Ícone de som */}
-        <TouchableOpacity style={[styles.soundIcon, width > 768 && styles.soundIconDesktop]}>
+
+        {/* Botão de som */}
+        <TouchableOpacity style={[styles.soundIcon, width > 768 && styles.soundIconDesktop]} onPress={playSound}>
           <Ionicons name="volume-high" size={30} color="white" />
         </TouchableOpacity>
 
         <View style={[styles.overlay, width > 768 && styles.overlayDesktop]}>
-
           <Text style={[styles.title, width > 768 && styles.titleDesktop]}>POLIEDRO{"\n"}DO MILHÃO</Text>
-          
           <Image source={require('../../../assets/images/Coin.png')} style={styles.coin} />
-          
           <Text style={[styles.subtitle, width > 768 && styles.subtitleDesktop]}>CADASTRO USUÁRIO</Text>
 
           <TextInput
@@ -113,11 +124,8 @@ export default function CadastroUsuario() {
           <TouchableOpacity style={styles.button} onPress={handleFinalizarCadastro}>
             <Text style={styles.buttonText}>Finalizar Cadastro</Text>
           </TouchableOpacity>
-          
         </View>
-
       </ImageBackground>
-
     </ScrollView>
   );
 }
