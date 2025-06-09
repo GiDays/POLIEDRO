@@ -33,7 +33,15 @@ useFocusEffect(
           const usuario = JSON.parse(usuarioSalvo);
           setEmail(usuario.email);
 
-          const response = await axios.get(`http://192.168.0.18:5000/partidas/${usuario.email}`);
+          let response;
+          if (usuario.email.endsWith('@sistemapoliedro.com.br')) {
+            // Professor: busca todas as tentativas
+            response = await axios.get(`http://192.168.0.18:5000/partidas-todas`);
+          } else {
+            // Aluno: busca apenas suas tentativas
+            response = await axios.get(`http://192.168.0.18:5000/partidas/${usuario.email}`);
+          }
+
           setTentativas(response.data);
         } else {
           setError('Usuário não encontrado no armazenamento.');
@@ -48,6 +56,7 @@ useFocusEffect(
     loadEmailAndData();
   }, [])
 );
+
 
   return (
     <ImageBackground
@@ -95,6 +104,11 @@ useFocusEffect(
               ) : (
                 tentativas.map((tentativa, index) => (
                   <View key={tentativa._id}>
+                    {email?.endsWith('@sistemapoliedro.com.br') && (
+                      <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>
+                        Aluno: {tentativa.email}
+                      </Text>
+                    )}
                     <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>
                       Tentativa {index + 1}: R$ {tentativa.pontuacao.toLocaleString('pt-BR')}
                     </Text>

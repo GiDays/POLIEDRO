@@ -212,6 +212,7 @@ app.post('/partidas', async (req, res) => {
   }
 });
 
+// get email alunos
 app.get('/partidas', async (req, res) => {
   try {
     const email = req.query.email;
@@ -223,6 +224,17 @@ app.get('/partidas', async (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar histórico' });
   }
 });
+
+// Rota para professor ver todas as tentativas
+app.get('/partidas-todas', async (req, res) => {
+  try {
+    const partidas = await Partida.find().sort({ data: -1 });
+    res.json(partidas);
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao buscar histórico geral' });
+  }
+});
+
 
 
 // Servidor rodando (Rota de Teste)
