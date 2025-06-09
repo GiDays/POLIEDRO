@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   // navegação entre telas:
@@ -22,13 +23,18 @@ export default function App() {
   }
 
   try {
-    const resposta = await axios.post('http://192.168.15.169:5000/login', {
+    const resposta = await axios.post('http://192.168.0.18:5000/login', {
       email,
       senha
     });
 
     console.log('Login bem-sucedido:', resposta.data);
-    alert('Login realizado com sucesso!');
+
+    const { usuario } = resposta.data; // pega os dados do usuário
+    await AsyncStorage.setItem('usuario', JSON.stringify(usuario));
+
+    alert(`Bem-vindo, ${usuario.nome}!`);
+    //alert('Login realizado com sucesso!');
 
     if (email.includes('@sistemapoliedro.com.br')) {
       router.push('../(tabs)/ProfessorScreen/');

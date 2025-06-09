@@ -64,7 +64,7 @@ export default function CadastroUsuario() {
     }
 
     try {
-      const response = await axios.post('http://192.168.15.169:5000/registro', {
+      const response = await axios.post('http://192.168.0.18:5000/registro', {
         email, senha, nome
       });
 

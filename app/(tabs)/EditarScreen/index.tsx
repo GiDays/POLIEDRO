@@ -55,11 +55,11 @@ export default function EditarPerguntaScreen() {
   let url = '';
 
   if (serie === '1') {
-    url = 'http://192.168.15.169:5000/perguntas';
+    url = 'http://192.168.0.18:5000/perguntas';
   } else if (serie === '2') {
-    url = 'http://192.168.15.169:5000/perguntas2';
+    url = 'http://192.168.0.18:5000/perguntas2';
   } else {
-    url = 'http://192.168.15.169:5000/perguntas3';
+    url = 'http://192.168.0.18:5000/perguntas3';
   }
 
   try {

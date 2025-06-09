@@ -88,7 +88,7 @@ export default function QuizScreen() {
 
   // Conexão perguntas
   useEffect(() => {
-  axios.get('http://192.168.15.169:5000/quiz2')
+  axios.get('http://192.168.0.18:5000/quiz2')
     .then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
         setPerguntas(response.data);
@@ -237,7 +237,7 @@ export default function QuizScreen() {
     setCarregando(true);
     setUsouDica(false);
 
-    axios.get('http://192.168.15.169:5000/quiz2')
+    axios.get('http://192.168.0.18:5000/quiz2')
       .then(response => {
         if (Array.isArray(response.data) && response.data.length > 0) {
           setPerguntas(response.data);

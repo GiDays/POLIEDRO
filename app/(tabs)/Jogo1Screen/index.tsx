@@ -63,6 +63,7 @@ export default function QuizScreen() {
   const [mostrarDica, setMostrarDica] = useState(false); //Dica
   const [usouDica, setUsouDica] = useState(false);
   
+  
   const perguntaAtual = perguntas[indicePergunta];
 
   const premios = [
@@ -78,17 +79,9 @@ export default function QuizScreen() {
     1000000   // Pergunta 10 - muito difícil
   ];
 
-  // -2 alternativas
-  useEffect(() => {
-  if (perguntaAtual) {
-    setAlternativasVisiveis(perguntaAtual.alternativas);
-    setMostrarDica(false);
-  }
-  }, [indicePergunta, perguntas]);
-
   // Conexão perguntas
   useEffect(() => {
-  axios.get('http://192.168.15.169:5000/quiz')
+  axios.get('http://192.168.0.18:5000/quiz')
     .then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
         setPerguntas(response.data);
@@ -154,10 +147,30 @@ export default function QuizScreen() {
           {parou ? "Você parou e ganhou: " : "Você ganhou: "} R$ {premioFinal.toLocaleString('pt-BR')}
         </Text>
         
-        <TouchableOpacity style={styles.controlButton} onPress={() => {reiniciarJogo();
-        router.replace('../../(tabs)/HomeScreen');}}>
+        <TouchableOpacity
+          style={styles.controlButton}
+          onPress={async () => {
+            try {
+              // Envie a partida para o servidor
+              await axios.post('http://SEU_BACKEND_URL/partidas', {
+                email: email, // substitua pela variável do email
+                pontuacao: premioFinal,
+                
+              });
+
+              console.log('Partida salva com sucesso!');
+            } catch (error) {
+              console.error('Erro ao salvar partida:', error);
+            }
+
+            // Reinicie o jogo e vá para a tela inicial
+            reiniciarJogo();
+            router.replace('../../(tabs)/HomeScreen');
+          }}
+        >
           <Text style={styles.controlText}>Jogar Novamente</Text>
         </TouchableOpacity>
+
       
       </View>
     );
@@ -237,7 +250,7 @@ export default function QuizScreen() {
     setCarregando(true);
     setUsouDica(false);
 
-    axios.get('http://192.168.15.169:5000/quiz')
+    axios.get('http://192.168.0.18:5000/quiz')
       .then(response => {
         if (Array.isArray(response.data) && response.data.length > 0) {
           setPerguntas(response.data);

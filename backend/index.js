@@ -62,7 +62,15 @@ app.post('/login', async (req, res) => {
     }
 
     // Se deu certo
-    res.status(200).json({ mensagem: 'Login bem-sucedido!' });
+    res.status(200).json({ 
+      mensagem: 'Login bem-sucedido!', 
+      usuario: {
+        id: usuario._id,
+        nome: usuario.nome,
+        email: usuario.email
+      }
+    });
+
 
   } catch (error) {
     res.status(500).json({ mensagem: 'Erro no servidor.', erro: error.message });
