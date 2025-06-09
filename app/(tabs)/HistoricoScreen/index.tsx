@@ -37,12 +37,15 @@ useFocusEffect(
           if (usuario.email.endsWith('@sistemapoliedro.com.br')) {
             // Professor: busca todas as tentativas
             response = await axios.get(`http://192.168.0.18:5000/partidas-todas`);
+            setTentativas(response.data);
           } else {
             // Aluno: busca apenas suas tentativas
-            response = await axios.get(`http://192.168.0.18:5000/partidas/${usuario.email}`);
+            response = await axios.get(`http://192.168.0.18:5000/partidas?email=${usuario.email}`);
+            setTentativas(response.data);
           }
+          
 
-          setTentativas(response.data);
+          //setTentativas(response.data);
         } else {
           setError('Usuário não encontrado no armazenamento.');
         }
