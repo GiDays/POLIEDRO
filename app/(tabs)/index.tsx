@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 export default function App() {
   // navegação entre telas:
@@ -14,6 +16,13 @@ export default function App() {
   // cadastro
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+
+  useFocusEffect(
+    useCallback(() => {
+      setEmail('');
+      setSenha('');
+    }, [])
+  );
 
   // função de login 
   const handleLogin = async () => {
