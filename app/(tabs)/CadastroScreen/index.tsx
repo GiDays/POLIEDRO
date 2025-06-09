@@ -69,6 +69,8 @@ export default function CadastroUsuario() {
       });
 
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+      console.log('Cadastro realizado com sucesso');
+      alert('Cadastro realizado com sucesso!');
       router.push('../(tabs)/HomeScreen');
     } catch (error) {
       const err = error as any;
