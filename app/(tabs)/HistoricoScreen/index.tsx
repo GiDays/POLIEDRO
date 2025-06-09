@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ImageBackground, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Tentativa {
   _id: string;
@@ -22,7 +23,9 @@ export default function HistoricoScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+
+useFocusEffect(
+  React.useCallback(() => {
     async function loadEmailAndData() {
       try {
         const usuarioSalvo = await AsyncStorage.getItem('usuario');
@@ -41,9 +44,10 @@ export default function HistoricoScreen() {
         setLoading(false);
       }
     }
-    loadEmailAndData();
-  }, []);
 
+    loadEmailAndData();
+  }, [])
+);
 
   return (
     <ImageBackground
