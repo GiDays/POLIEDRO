@@ -30,9 +30,9 @@ export default function App() {
     console.log('Login bem-sucedido:', resposta.data);
     alert('Login realizado com sucesso!');
 
-    if (email.includes('@professor')) {
+    if (email.includes('@sistemapoliedro.com.br')) {
       router.push('../(tabs)/ProfessorScreen/');
-    } else if (email.includes('@aluno')) {
+    } else if (email.includes('@p4ed.com')) {
       router.push('../../(tabs)/HomeScreen/');
     } else {
       router.push('../../(tabs)/HomeScreen/');
