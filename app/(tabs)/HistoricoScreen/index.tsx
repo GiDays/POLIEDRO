@@ -1,14 +1,49 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ImageBackground, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+interface Tentativa {
+  _id: string;
+  email: string;
+  pontuacao: number;
+  data: string;
+}
 
 export default function HistoricoScreen() {
   const router = useRouter();
-
   const { width } = useWindowDimensions(); // responsividade
-
   const isDesktop = width > 768;
+
+  const [email, setEmail] = useState<string | null>(null);
+  const [tentativas, setTentativas] = useState<Tentativa[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadEmailAndData() {
+      try {
+        const usuarioSalvo = await AsyncStorage.getItem('usuario');
+        if (usuarioSalvo) {
+          const usuario = JSON.parse(usuarioSalvo);
+          setEmail(usuario.email);
+
+          const response = await axios.get(`http://192.168.0.18:5000/partidas/${usuario.email}`);
+          setTentativas(response.data);
+        } else {
+          setError('Usuário não encontrado no armazenamento.');
+        }
+      } catch (err: any) {
+        setError('Erro ao carregar tentativas: ' + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadEmailAndData();
+  }, []);
+
 
   return (
     <ImageBackground
@@ -49,13 +84,25 @@ export default function HistoricoScreen() {
           {/* Tentativas */}
           <View style={[styles.attemptsBox, isDesktop && styles.attemptsBoxDesktop]}>
             <ScrollView>
-              <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>Tentativa 1: R$ 500.000,00</Text>
-              <View style={styles.separator} />
-              <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>Tentativa 2: R$ 100.000,00</Text>
-              <View style={styles.separator} />
-              <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>Tentativa 3: R$ 50.000,00</Text>
-              {/* Adicione mais tentativas conforme necessário */}
+              {tentativas.length === 0 ? (
+                <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>
+                  Nenhuma tentativa encontrada.
+                </Text>
+              ) : (
+                tentativas.map((tentativa, index) => (
+                  <View key={tentativa._id}>
+                    <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>
+                      Tentativa {index + 1}: R$ {tentativa.pontuacao.toLocaleString('pt-BR')}
+                    </Text>
+                    <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>
+                      Data: {new Date(tentativa.data).toLocaleDateString('pt-BR')} {new Date(tentativa.data).toLocaleTimeString('pt-BR')}
+                    </Text>
+                    <View style={styles.separator} />
+                  </View>
+                ))
+              )}
             </ScrollView>
+
           </View>
 
           {/* Bolinhas inferiores */}

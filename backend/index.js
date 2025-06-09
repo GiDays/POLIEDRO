@@ -212,14 +212,18 @@ app.post('/partidas', async (req, res) => {
   }
 });
 
-app.get('/partidas/:email', async (req, res) => {
+app.get('/partidas', async (req, res) => {
   try {
-    const partidas = await Partida.find({ email: req.params.email }).sort({ data: -1 });
+    const email = req.query.email;
+    if (!email) return res.status(400).json({ error: 'Email não informado' });
+
+    const partidas = await Partida.find({ email }).sort({ data: -1 });
     res.json(partidas);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar histórico' });
   }
 });
+
 
 // Servidor rodando (Rota de Teste)
 app.get('/', (req, res) => {
