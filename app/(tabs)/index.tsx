@@ -33,6 +33,9 @@ export default function App() {
     const { usuario } = resposta.data; // pega os dados do usuário
     await AsyncStorage.setItem('usuario', JSON.stringify(usuario));
 
+    const teste = await AsyncStorage.getItem('usuario');
+    console.log('Verificando o que foi salvo no AsyncStorage:', teste);
+
     alert(`Bem-vindo, ${usuario.nome}!`);
     //alert('Login realizado com sucesso!');
 

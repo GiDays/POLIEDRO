@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, useWindowDimensions, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Series = '1' | '2' | '3';
 
@@ -14,6 +15,24 @@ const SERIES_GAME_SCREENS: Record<Series, string> = {
 export default function SerieScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    const carregarEmail = async () => {
+      try {
+        const usuarioSalvo = await AsyncStorage.getItem('usuario');
+        if (usuarioSalvo) {
+          const usuario = JSON.parse(usuarioSalvo);
+          console.log('Email carregado:', usuario.email);
+          setEmail(usuario.email);
+        }
+      } catch (erro) {
+        console.error('Erro ao carregar o e-mail:', erro);
+      }
+    };
+
+    carregarEmail();
+  }, []);
 
   const handleSelectSerie = (serie: Series) => {
     router.navigate({

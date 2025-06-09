@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import {TouchableOpacity, ImageBackground,View,Text,StyleSheet,useWindowDimensions,ScrollView,Image, ActivityIndicator} from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage'; //pegar e-mail
 
 // Estrutura da pergunta
 interface Pergunta {
@@ -63,6 +64,7 @@ export default function QuizScreen() {
   const [mostrarDica, setMostrarDica] = useState(false); //Dica
   const [usouDica, setUsouDica] = useState(false);
   
+  const [email, setEmail] = useState<string | null>(null);
   
   const perguntaAtual = perguntas[indicePergunta];
 
@@ -81,6 +83,14 @@ export default function QuizScreen() {
 
   // Conexão perguntas
   useEffect(() => {
+    if (perguntas.length > 0) {
+      setAlternativasVisiveis(perguntas[indicePergunta].alternativas);
+      setMostrarDica(false);
+      setUsouDica(false);
+    }
+  }, [perguntas, indicePergunta]);
+
+  useEffect(() => {
   axios.get('http://192.168.0.18:5000/quiz')
     .then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
@@ -94,6 +104,24 @@ export default function QuizScreen() {
       console.error('Erro ao carregar perguntas:', error);
       setCarregando(false);
     });
+  }, []);
+
+  //Conexão com e-mail correto
+  useEffect(() => {
+    async function loadEmail() {
+      try {
+        const usuarioSalvo = await AsyncStorage.getItem('usuario');
+        if (usuarioSalvo) {
+          const usuario = JSON.parse(usuarioSalvo);
+          setEmail(usuario.email);
+        } else {
+          console.warn('Nenhum usuário encontrado no AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar email do AsyncStorage:', error);
+      }
+    }
+    loadEmail();
   }, []);
 
   // Função de cálculo de patamar
@@ -150,12 +178,16 @@ export default function QuizScreen() {
         <TouchableOpacity
           style={styles.controlButton}
           onPress={async () => {
+            if (!email) {
+              alert("E-mail do usuário não encontrado. Por favor, faça login novamente.");
+              return;
+            }
+
             try {
               // Envie a partida para o servidor
-              await axios.post('http://SEU_BACKEND_URL/partidas', {
-                email: email, // substitua pela variável do email
+              await axios.post('http://192.168.0.18:5000/partidas', {
+                email: email, 
                 pontuacao: premioFinal,
-                
               });
 
               console.log('Partida salva com sucesso!');

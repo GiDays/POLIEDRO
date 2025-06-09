@@ -197,15 +197,14 @@ app.post('/perguntas3', async (req, res) => {
 const partidaSchema = new mongoose.Schema({
   email: { type: String, required: true },
   pontuacao: { type: Number, required: true },
-  data: { type: Date, default: Date.now },
-  perguntasRespondidas: [{ pergunta: String, respostaUsuario: String, correta: String }]
+  data: { type: Date, default: Date.now }
 });
 const Partida = mongoose.model('Partida', partidaSchema, 'tentativas');
 
 app.post('/partidas', async (req, res) => {
-  const { email, pontuacao, perguntasRespondidas } = req.body;
+  const { email, pontuacao } = req.body;
   try {
-    const novaPartida = new Partida({ email, pontuacao, perguntasRespondidas });
+    const novaPartida = new Partida({ email, pontuacao });
     await novaPartida.save();
     res.status(201).json({ message: 'Partida salva com sucesso!' });
   } catch (err) {
