@@ -1,5 +1,5 @@
 import React, {useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ImageBackground, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ImageBackground, useWindowDimensions, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
@@ -24,6 +24,7 @@ export default function HistoricoScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [busca, setBusca] = useState('');
   const [alunoSelecionado, setAlunoSelecionado] = useState<string>('todos');
   const [alunos, setAlunos] = useState<string[]>([]);
 
@@ -72,6 +73,10 @@ export default function HistoricoScreen() {
     ? tentativas
     : tentativas.filter(t => t.email === alunoSelecionado);
 
+  const alunosFiltrados = alunos.filter(aluno =>
+    aluno.toLowerCase().includes(busca.toLowerCase())
+  );
+    
   return (
     <ImageBackground
       source={require('../../../assets/images/TelaVermelha.png')}
@@ -106,6 +111,23 @@ export default function HistoricoScreen() {
               <Text style={{ color: 'white', textAlign: 'left', marginBottom: 4 }}>
                 Selecione um aluno:
               </Text>
+
+              {/* Campo de busca */}
+              <TextInput
+                placeholder="Digite o nome ou e-mail"
+                placeholderTextColor="#888"
+                value={busca}
+                onChangeText={setBusca}
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: 10,
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  fontSize: 15,
+                  marginBottom: 8,
+                }}
+              />
+
               <View
                 style={{
                   backgroundColor: 'white',
@@ -126,7 +148,7 @@ export default function HistoricoScreen() {
                   dropdownIconColor="#790000" // se estiver no Android
                 >
                   <Picker.Item label="Todos os alunos" value="todos" />
-                  {alunos.map(aluno => (
+                  {alunosFiltrados.map(aluno => (
                     <Picker.Item key={aluno} label={aluno} value={aluno} />
                   ))}
                 </Picker>
