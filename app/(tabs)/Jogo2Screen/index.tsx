@@ -68,6 +68,7 @@ export default function QuizScreen() {
   const [respostaCorretaFinal, setRespostaCorretaFinal] = useState<boolean | null>(null);
   
   const [email, setEmail] = useState<string | null>(null);
+  const params = useLocalSearchParams();
 
   const perguntaAtual = perguntas[indicePergunta];
 
@@ -83,8 +84,6 @@ export default function QuizScreen() {
     300000,   // Pergunta 9 - difícil
     1000000   // Pergunta 10 - muito difícil
   ];
-
-  const params = useLocalSearchParams();
 
   // -2 alternativas
   useEffect(() => {

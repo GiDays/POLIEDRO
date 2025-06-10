@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import {TouchableOpacity, ImageBackground,View,Text,StyleSheet,useWindowDimensions,ScrollView,Image, ActivityIndicator} from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocalSearchParams } from 'expo-router';
 
 // Estrutura da pergunta
 interface Pergunta {
@@ -65,6 +67,9 @@ export default function QuizScreen() {
   const [usouRemoverDuas, setUsouRemoverDuas] = useState(false);
   const [respostaCorretaFinal, setRespostaCorretaFinal] = useState<boolean | null>(null);
   
+  const [email, setEmail] = useState<string | null>(null);
+  const params = useLocalSearchParams();
+
   const perguntaAtual = perguntas[indicePergunta];
 
   const premios = [
@@ -105,6 +110,31 @@ export default function QuizScreen() {
     });
   }, []);
 
+  //Conexão com e-mail correto
+  useEffect(() => {
+    async function loadEmail() {
+      try {
+        const usuarioSalvo = await AsyncStorage.getItem('usuario');
+        if (usuarioSalvo) {
+          const usuario = JSON.parse(usuarioSalvo);
+          setEmail(usuario.email);
+        } else {
+          console.warn('Nenhum usuário encontrado no AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar email do AsyncStorage:', error);
+      }
+    }
+    loadEmail();
+  }, []);
+
+  // Salva a série atual no AsyncStorage
+  useEffect(() => {
+    if (params?.serie) {
+      AsyncStorage.setItem('serieAtual', String(params.serie));
+    }
+  }, [params]);
+
   // Função de cálculo de patamar
   function calcularPatamar(indice: number, acertou: boolean): number {
     // Se acertou a última pergunta, ganha 1.000.000
@@ -117,7 +147,6 @@ export default function QuizScreen() {
     return 0;
   }
 
-  // Lógica do Jogo
   // Lógica do Jogo
   function responder(letraSelecionada: string) {
   const perguntaAtual = perguntas[indicePergunta];
@@ -164,10 +193,36 @@ export default function QuizScreen() {
           {parou ? "Você parou e ganhou: " : "Você ganhou: "} R$ {premioFinal.toLocaleString('pt-BR')}
         </Text>
         
-        <TouchableOpacity style={styles.controlButton} onPress={() => {reiniciarJogo();
-        router.replace('../../(tabs)/HomeScreen');}}>
+        <TouchableOpacity
+          style={styles.controlButton}
+          onPress={async () => {
+            if (!email) {
+              alert("E-mail do usuário não encontrado. Por favor, faça login novamente.");
+              return;
+            }
+
+            try {
+              // Envie a partida para o servidor
+              const serie = await AsyncStorage.getItem('serieAtual');
+              await axios.post('http://192.168.0.18:5000/partidas', {
+                email: email, 
+                pontuacao: premioFinal,
+                serie: serie || 'não informada'
+              });
+
+              console.log('Partida salva com sucesso!');
+            } catch (error) {
+              console.error('Erro ao salvar partida:', error);
+            }
+
+            // Reinicie o jogo e vá para a tela inicial
+            reiniciarJogo();
+            router.replace('../../(tabs)/HomeScreen');
+          }}
+        >
           <Text style={styles.controlText}>Jogar Novamente</Text>
         </TouchableOpacity>
+
       
       </View>
     );
@@ -268,7 +323,6 @@ export default function QuizScreen() {
         setCarregando(false);
       });
   }
-
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
