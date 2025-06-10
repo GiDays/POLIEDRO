@@ -64,6 +64,7 @@ export default function QuizScreen() {
   const [alternativasVisiveis, setAlternativasVisiveis] = useState<string[]>([]); // -2 alternativas
   const [mostrarDica, setMostrarDica] = useState(false); //Dica
   const [usouDica, setUsouDica] = useState(false);
+  const [usouRemoverDuas, setUsouRemoverDuas] = useState(false);
   
   const [email, setEmail] = useState<string | null>(null);
   
@@ -270,17 +271,22 @@ export default function QuizScreen() {
 
   // Função para remover duas alternativas
   function removerDuasAlternativas() {
-    const incorretas = alternativasVisiveis.filter(
-      alt => alt.charAt(0).toUpperCase() !== perguntaAtual.correta.charAt(0).toUpperCase()
-    );
+    if (usouRemoverDuas) {
+      alert("Você já usou a opção '-2 alternativas' nesta partida.");
+    } else {
+      const incorretas = alternativasVisiveis.filter(
+        alt => alt.charAt(0).toUpperCase() !== perguntaAtual.correta.charAt(0).toUpperCase()
+      );
 
-    const selecionadas = incorretas.sort(() => 0.5 - Math.random()).slice(0, 2);
+      const selecionadas = incorretas.sort(() => 0.5 - Math.random()).slice(0, 2);
 
-    const novas = alternativasVisiveis.filter(
-      alt => !selecionadas.includes(alt)
-    );
+      const novas = alternativasVisiveis.filter(
+        alt => !selecionadas.includes(alt)
+      );
 
-    setAlternativasVisiveis(novas);
+      setAlternativasVisiveis(novas);
+      setUsouRemoverDuas(true);
+      }
   }
 
   // Função Dica
@@ -302,6 +308,7 @@ export default function QuizScreen() {
     setUsosPular(1);
     setCarregando(true);
     setUsouDica(false);
+    setUsouRemoverDuas(false);
 
     axios.get('http://192.168.0.18:5000/quiz')
       .then(response => {
