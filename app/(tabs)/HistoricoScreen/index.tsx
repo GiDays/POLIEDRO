@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
 
 interface Tentativa {
   _id: string;
@@ -23,43 +24,53 @@ export default function HistoricoScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [alunoSelecionado, setAlunoSelecionado] = useState<string>('todos');
+  const [alunos, setAlunos] = useState<string[]>([]);
 
-useFocusEffect(
-  React.useCallback(() => {
-    async function loadEmailAndData() {
-      try {
-        const usuarioSalvo = await AsyncStorage.getItem('usuario');
-        if (usuarioSalvo) {
-          const usuario = JSON.parse(usuarioSalvo);
-          setEmail(usuario.email);
 
-          let response;
-          if (usuario.email.endsWith('@sistemapoliedro.com.br')) {
-            // Professor: busca todas as tentativas
-            response = await axios.get(`http://192.168.0.18:5000/partidas-todas`);
-            setTentativas(response.data);
+  useFocusEffect(
+    React.useCallback(() => {
+      async function loadEmailAndData() {
+        try {
+          const usuarioSalvo = await AsyncStorage.getItem('usuario');
+          if (usuarioSalvo) {
+            const usuario = JSON.parse(usuarioSalvo);
+            setEmail(usuario.email);
+
+            let response;
+            if (usuario.email.endsWith('@sistemapoliedro.com.br')) {
+              // Professor: busca todas as tentativas
+              response = await axios.get(`http://192.168.0.18:5000/partidas-todas`);
+              setTentativas(response.data);
+              const tentativasData: Tentativa[] = response.data;
+              setTentativas(tentativasData);
+
+              const alunosUnicos = [...new Set(tentativasData.map(t => t.email))];
+              setAlunos(alunosUnicos);
+
+            } else {
+              // Aluno: busca apenas suas tentativas
+              response = await axios.get(`http://192.168.0.18:5000/partidas?email=${usuario.email}`);
+              setTentativas(response.data);
+            }
+            
           } else {
-            // Aluno: busca apenas suas tentativas
-            response = await axios.get(`http://192.168.0.18:5000/partidas?email=${usuario.email}`);
-            setTentativas(response.data);
+            setError('Usuário não encontrado no armazenamento.');
           }
-          
-
-          //setTentativas(response.data);
-        } else {
-          setError('Usuário não encontrado no armazenamento.');
+        } catch (err: any) {
+          setError('Erro ao carregar tentativas: ' + err.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (err: any) {
-        setError('Erro ao carregar tentativas: ' + err.message);
-      } finally {
-        setLoading(false);
       }
-    }
 
-    loadEmailAndData();
-  }, [])
-);
+      loadEmailAndData();
+    }, [])
+  );
 
+  const tentativasFiltradas = alunoSelecionado === 'todos'
+    ? tentativas
+    : tentativas.filter(t => t.email === alunoSelecionado);
 
   return (
     <ImageBackground
@@ -90,22 +101,49 @@ useFocusEffect(
         {/* Bloco com tentativas */}
         <View style={[styles.historyBox, isDesktop && styles.historyBoxDesktop]}>
           
-          {/* Bolinhas superiores */}
-          {/* <View style={[styles.bullets, isDesktop && styles.bulletsDesktop]}>
-            {Array.from({ length: 20 }).map((_, index) => (
-              <View key={index} style={styles.bullet} />
-            ))}
-          </View> */}
+          {email?.endsWith('@sistemapoliedro.com.br') && (
+            <View style={{ marginBottom: 10, width: '90%' }}>
+              <Text style={{ color: 'white', textAlign: 'left', marginBottom: 4 }}>
+                Selecione um aluno:
+              </Text>
+              <View
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: 10,
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  height: 30, 
+                  justifyContent: 'center',
+                }}
+              >
+                <Picker
+                  selectedValue={alunoSelecionado}
+                  onValueChange={(itemValue) => setAlunoSelecionado(itemValue)}
+                  style={{
+                    height: 30, 
+                    fontSize: 15,
+                  }}
+                  dropdownIconColor="#790000" // se estiver no Android
+                >
+                  <Picker.Item label="Todos os alunos" value="todos" />
+                  {alunos.map(aluno => (
+                    <Picker.Item key={aluno} label={aluno} value={aluno} />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+          )}
 
           {/* Tentativas */}
           <View style={[styles.attemptsBox, isDesktop && styles.attemptsBoxDesktop]}>
+            
             <ScrollView>
-              {tentativas.length === 0 ? (
+              {tentativasFiltradas.length === 0 ? (
                 <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>
                   Nenhuma tentativa encontrada.
                 </Text>
               ) : (
-                tentativas.map((tentativa, index) => (
+                tentativasFiltradas.map((tentativa, index) => (
                   <View key={tentativa._id}>
                     {email?.endsWith('@sistemapoliedro.com.br') && (
                       <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>
@@ -125,13 +163,6 @@ useFocusEffect(
             </ScrollView>
 
           </View>
-
-          {/* Bolinhas inferiores */}
-          {/* <View style={styles.bullets}>
-            {Array.from({ length: 20 }).map((_, index) => (
-              <View key={index} style={styles.bullet} />
-            ))}
-          </View> */}
           
         </View>
       </View>
@@ -188,7 +219,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     resizeMode: 'contain',
-    marginBottom: 150,
+    marginBottom: 100,
     marginRight: 10,
   },
   title: {
@@ -196,10 +227,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#FFD700',
-    marginBottom: 150,
+    marginBottom: 100,
   },
    titleDesktop: {
-    fontSize: 40,
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#FFD700',
+    marginBottom: 100,
   },
   historyTitle: {
     fontSize: 20,
@@ -208,7 +243,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   historyTitleDesktop: {
-    fontSize: 28,
+    fontSize: 25,
   },
   historyBox: {
     width: '70%',
@@ -218,27 +253,12 @@ const styles = StyleSheet.create({
     paddingVertical: 25,
   },
   historyBoxDesktop: {
-    width: '70%',
+    width: '60%',
+    backgroundColor: '#790000',
+    borderRadius: 10,
+    alignItems: 'center',
+    paddingVertical: 20,
   },
-  // bullets: {
-  //   flexDirection: 'row',
-  //   flexWrap: 'wrap',
-  //   justifyContent: 'center',
-  //   marginVertical: 8,
-  // },
-  // bulletsDesktop: {
-  //   flexDirection: 'row',
-  //   flexWrap: 'wrap',
-  //   justifyContent: 'center',
-  //   marginVertical: 8,
-  // },
-  // bullet: {
-  //   width: 10,
-  //   height: 10,
-  //   borderRadius: 5,
-  //   backgroundColor: '#FFD700',
-  //   margin: 3,
-  // },
   attemptsBox: {
     backgroundColor: '#FFF',
     width: '90%',
@@ -247,8 +267,11 @@ const styles = StyleSheet.create({
     maxHeight: 200,
   },
   attemptsBoxDesktop: {
-    maxHeight: 300,
+    backgroundColor: '#FFF',
+    width: '90%',
+    borderRadius: 10,
     padding: 15,
+    maxHeight: 200,
   },
   attemptText: {
     fontSize: 16,
