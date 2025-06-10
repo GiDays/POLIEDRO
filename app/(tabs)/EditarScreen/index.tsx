@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import {View, Text, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions, Image, ImageBackground, ScrollView} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
+import { useRouter } from 'expo-router';
 
 export default function EditarPerguntaScreen() {
   const { width } = useWindowDimensions();
+  const router = useRouter();
 
   const [pergunta, setPergunta] = useState('');
   const [dificuldade, setDificuldade] = useState('');
@@ -21,6 +23,10 @@ export default function EditarPerguntaScreen() {
   D: '',
   });
 
+  const handleCancelar = () => {
+    router.push('../../ProfessorScreen');
+  };
+
   const handleSalvar = async () => {
   if (
     !serie ||
@@ -36,6 +42,7 @@ export default function EditarPerguntaScreen() {
     alert('Preencha todos os campos!');
     return;
   }
+
 
   const alternativasArray = (['A', 'B', 'C', 'D'] as LetraAlternativa[]).map(
     (letra) => `${letra}) ${alternativas[letra]}`
@@ -184,10 +191,16 @@ export default function EditarPerguntaScreen() {
           </View>
         </View>
 
+        <View style={{ flexDirection: 'row', justifyContent: 'center', width: '90%', marginTop: 10, gap:10 }}>
+          <TouchableOpacity style={styles.cancelarButton} onPress={handleCancelar}>
+            <Text style={styles.saveButtonText}>Cancelar</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.saveButton} onPress={handleSalvar}>
             <Text style={styles.saveButtonText}>Salvar</Text>
           </TouchableOpacity>
-
+        </View>
+          
         </View>
       </ImageBackground>
     </ScrollView>
@@ -255,11 +268,22 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: '#D5241C',
     paddingVertical: 12,
-    paddingHorizontal: 30,
+    paddingHorizontal: 36,
     borderRadius: 20,
     marginTop: 20,
   },
   saveButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  cancelarButton: {
+    backgroundColor: '#D5241C',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 20,
+    marginTop: 20,
+  },
+  cancelarButtonText: {
     color: 'white',
     fontWeight: 'bold',
   },
