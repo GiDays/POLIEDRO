@@ -94,15 +94,6 @@ export default function QuizScreen() {
   }
   }, [indicePergunta, perguntas]);
 
-  // Conexão perguntas
-  // useEffect(() => {
-  //   if (perguntas.length > 0) {
-  //     setAlternativasVisiveis(perguntas[indicePergunta].alternativas);
-  //     setMostrarDica(false);
-  //     setUsouDica(false);
-  //   }
-  // }, [perguntas, indicePergunta]);
-
   useEffect(() => {
   axios.get('http://192.168.0.18:5000/quiz')
     .then(response => {

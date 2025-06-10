@@ -62,6 +62,8 @@ export default function QuizScreen() {
   const [alternativasVisiveis, setAlternativasVisiveis] = useState<string[]>([]); // -2 alternativas
   const [mostrarDica, setMostrarDica] = useState(false); //Dica
   const [usouDica, setUsouDica] = useState(false);
+  const [usouRemoverDuas, setUsouRemoverDuas] = useState(false);
+  const [respostaCorretaFinal, setRespostaCorretaFinal] = useState<boolean | null>(null);
   
   const perguntaAtual = perguntas[indicePergunta];
 
@@ -104,12 +106,18 @@ export default function QuizScreen() {
   }, []);
 
   // Função de cálculo de patamar
-  function calcularPatamar(indice: any) {
-    if (indice >= 7) return premios[6]; // R$50.000
-    if (indice >= 4) return premios[4]; // R$10.000
+  function calcularPatamar(indice: number, acertou: boolean): number {
+    // Se acertou a última pergunta, ganha 1.000.000
+    if (indice === 9 && acertou) return premios[9];
+
+    // Se errou a última (ou qualquer outra), calcula o último patamar garantido
+    if (indice >= 7) return premios[6]; // R$ 50.000
+    if (indice >= 4) return premios[4]; // R$ 10.000
+
     return 0;
   }
 
+  // Lógica do Jogo
   // Lógica do Jogo
   function responder(letraSelecionada: string) {
   const perguntaAtual = perguntas[indicePergunta];
@@ -122,6 +130,7 @@ export default function QuizScreen() {
     setPontuacao(prev => prev + 1);
 
     if (indicePergunta + 1 === perguntas.length) {
+      setRespostaCorretaFinal(true);
       setJogoFinalizado(true);
     } else {
       setIndicePergunta(prev => prev + 1);
@@ -129,6 +138,7 @@ export default function QuizScreen() {
 
   } else {
     // Resposta errada: finaliza o jogo imediatamente
+    setRespostaCorretaFinal(false);
     setJogoFinalizado(true);
   }
   }
@@ -138,11 +148,11 @@ export default function QuizScreen() {
   if (parou) {
     premioFinal = premios[indicePergunta - 1] || 0;
   } else if (jogoFinalizado) {
-    if (indicePergunta === perguntas.length - 1 && jogoFinalizado) {
+    if (indicePergunta === perguntas.length - 1 && respostaCorretaFinal === true) {
       // Se chegou até o final, mesmo que tenha pulado, ganha o prêmio máximo
       premioFinal = premios[premios.length - 1];
     } else {
-      premioFinal = calcularPatamar(indicePergunta);
+      premioFinal = calcularPatamar(indicePergunta, false);
     }
   }
 
@@ -204,17 +214,22 @@ export default function QuizScreen() {
 
   // Função para remover duas alternativas
   function removerDuasAlternativas() {
-    const incorretas = alternativasVisiveis.filter(
-      alt => alt.charAt(0).toUpperCase() !== perguntaAtual.correta.charAt(0).toUpperCase()
-    );
+    if (usouRemoverDuas) {
+      alert("Você já usou a opção '-2 alternativas' nesta partida.");
+    } else {
+      const incorretas = alternativasVisiveis.filter(
+        alt => alt.charAt(0).toUpperCase() !== perguntaAtual.correta.charAt(0).toUpperCase()
+      );
 
-    const selecionadas = incorretas.sort(() => 0.5 - Math.random()).slice(0, 2);
+      const selecionadas = incorretas.sort(() => 0.5 - Math.random()).slice(0, 2);
 
-    const novas = alternativasVisiveis.filter(
-      alt => !selecionadas.includes(alt)
-    );
+      const novas = alternativasVisiveis.filter(
+        alt => !selecionadas.includes(alt)
+      );
 
-    setAlternativasVisiveis(novas);
+      setAlternativasVisiveis(novas);
+      setUsouRemoverDuas(true);
+      }
   }
 
   // Função Dica
@@ -236,6 +251,8 @@ export default function QuizScreen() {
     setUsosPular(1);
     setCarregando(true);
     setUsouDica(false);
+    setUsouRemoverDuas(false);
+    setRespostaCorretaFinal(null);
 
     axios.get('http://192.168.0.18:5000/quiz3')
       .then(response => {
