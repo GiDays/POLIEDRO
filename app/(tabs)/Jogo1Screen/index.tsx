@@ -65,6 +65,7 @@ export default function QuizScreen() {
   const [mostrarDica, setMostrarDica] = useState(false); //Dica
   const [usouDica, setUsouDica] = useState(false);
   const [usouRemoverDuas, setUsouRemoverDuas] = useState(false);
+  const [respostaCorretaFinal, setRespostaCorretaFinal] = useState<boolean | null>(null);
   
   const [email, setEmail] = useState<string | null>(null);
   
@@ -145,9 +146,14 @@ export default function QuizScreen() {
 
 
   // Função de cálculo de patamar
-  function calcularPatamar(indice: any) {
-    if (indice >= 7) return premios[6]; // R$50.000
-    if (indice >= 4) return premios[4]; // R$10.000
+  function calcularPatamar(indice: number, acertou: boolean): number {
+    // Se acertou a última pergunta, ganha 1.000.000
+    if (indice === 9 && acertou) return premios[9];
+
+    // Se errou a última (ou qualquer outra), calcula o último patamar garantido
+    if (indice >= 7) return premios[6]; // R$ 50.000
+    if (indice >= 4) return premios[4]; // R$ 10.000
+
     return 0;
   }
 
@@ -163,6 +169,7 @@ export default function QuizScreen() {
     setPontuacao(prev => prev + 1);
 
     if (indicePergunta + 1 === perguntas.length) {
+      setRespostaCorretaFinal(true);
       setJogoFinalizado(true);
     } else {
       setIndicePergunta(prev => prev + 1);
@@ -170,6 +177,7 @@ export default function QuizScreen() {
 
   } else {
     // Resposta errada: finaliza o jogo imediatamente
+    setRespostaCorretaFinal(false);
     setJogoFinalizado(true);
   }
   }
@@ -179,11 +187,11 @@ export default function QuizScreen() {
   if (parou) {
     premioFinal = premios[indicePergunta - 1] || 0;
   } else if (jogoFinalizado) {
-    if (indicePergunta === perguntas.length - 1 && jogoFinalizado) {
+    if (indicePergunta === perguntas.length - 1 && respostaCorretaFinal === true) {
       // Se chegou até o final, mesmo que tenha pulado, ganha o prêmio máximo
       premioFinal = premios[premios.length - 1];
     } else {
-      premioFinal = calcularPatamar(indicePergunta);
+      premioFinal = calcularPatamar(indicePergunta, false);
     }
   }
 
@@ -309,6 +317,7 @@ export default function QuizScreen() {
     setCarregando(true);
     setUsouDica(false);
     setUsouRemoverDuas(false);
+    setRespostaCorretaFinal(null);
 
     axios.get('http://192.168.0.18:5000/quiz')
       .then(response => {
