@@ -5,6 +5,7 @@ import {TouchableOpacity, ImageBackground,View,Text,StyleSheet,useWindowDimensio
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage'; //pegar e-mail
+import { useLocalSearchParams } from 'expo-router';
 
 // Estrutura da pergunta
 interface Pergunta {
@@ -81,6 +82,8 @@ export default function QuizScreen() {
     1000000   // Pergunta 10 - muito difícil
   ];
 
+  const params = useLocalSearchParams();
+
   // Conexão perguntas
   useEffect(() => {
     if (perguntas.length > 0) {
@@ -123,6 +126,14 @@ export default function QuizScreen() {
     }
     loadEmail();
   }, []);
+
+  // Salva a série atual no AsyncStorage
+  useEffect(() => {
+    if (params?.serie) {
+      AsyncStorage.setItem('serieAtual', String(params.serie));
+    }
+  }, [params]);
+
 
   // Função de cálculo de patamar
   function calcularPatamar(indice: any) {
@@ -185,9 +196,11 @@ export default function QuizScreen() {
 
             try {
               // Envie a partida para o servidor
+              const serie = await AsyncStorage.getItem('serieAtual');
               await axios.post('http://192.168.0.18:5000/partidas', {
                 email: email, 
                 pontuacao: premioFinal,
+                serie: serie || 'não informada'
               });
 
               console.log('Partida salva com sucesso!');

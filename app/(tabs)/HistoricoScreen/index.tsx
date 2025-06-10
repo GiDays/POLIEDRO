@@ -12,6 +12,7 @@ interface Tentativa {
   email: string;
   pontuacao: number;
   data: string;
+  serie?: string;
 }
 
 export default function HistoricoScreen() {
@@ -177,6 +178,9 @@ export default function HistoricoScreen() {
                     </Text>
                     <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>
                       Data: {new Date(tentativa.data).toLocaleDateString('pt-BR')} {new Date(tentativa.data).toLocaleTimeString('pt-BR')}
+                    </Text>
+                    <Text style={[styles.attemptText, isDesktop && styles.attemptTextDesktop]}>
+                      Série: {tentativa.serie || 'N/A'}
                     </Text>
                     <View style={styles.separator} />
                   </View>
