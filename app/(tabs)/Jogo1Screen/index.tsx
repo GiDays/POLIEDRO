@@ -84,14 +84,22 @@ export default function QuizScreen() {
 
   const params = useLocalSearchParams();
 
-  // Conexão perguntas
+  // -2 alternativas, dicas
   useEffect(() => {
-    if (perguntas.length > 0) {
-      setAlternativasVisiveis(perguntas[indicePergunta].alternativas);
-      setMostrarDica(false);
-      setUsouDica(false);
-    }
-  }, [perguntas, indicePergunta]);
+  if (perguntaAtual) {
+    setAlternativasVisiveis(perguntaAtual.alternativas);
+    setMostrarDica(false);
+  }
+  }, [indicePergunta, perguntas]);
+
+  // Conexão perguntas
+  // useEffect(() => {
+  //   if (perguntas.length > 0) {
+  //     setAlternativasVisiveis(perguntas[indicePergunta].alternativas);
+  //     setMostrarDica(false);
+  //     setUsouDica(false);
+  //   }
+  // }, [perguntas, indicePergunta]);
 
   useEffect(() => {
   axios.get('http://192.168.0.18:5000/quiz')
