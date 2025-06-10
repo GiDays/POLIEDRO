@@ -85,7 +85,16 @@ export default function HistoricoScreen() {
       resizeMode="cover"
     >
       {/* Ícones superiores */}
-      <TouchableOpacity style={[styles.backIcon, isDesktop && styles.backIconDesktop]} onPress={() => router.push('../../../(tabs)/HomeScreen/')}>
+      <TouchableOpacity
+        style={[styles.backIcon, isDesktop && styles.backIconDesktop]}
+        onPress={() => {
+          if (email?.endsWith('@sistemapoliedro.com.br')) {
+            router.push('../../../ProfessorScreen/');
+          } else {
+            router.push('../../../(tabs)/HomeScreen/');
+          }
+        }}
+      >
         <Ionicons name="arrow-back" size={30} color="white" />
       </TouchableOpacity>
 
