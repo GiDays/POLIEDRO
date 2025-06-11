@@ -62,8 +62,8 @@ O jogo é voltado para:
 
 ## 🛠️ Tecnologias utilizadas
 
-- **Frontend:** React Native  
-- **Backend:** JavaScript  
+- **Frontend:** React Native, TypeScript e JavaScrpit
+- **Backend:** JavaScript e TypeScript
 - **Banco de dados:** MongoDB  
 - **Design:** Canva  
 - **Versionamento:** GitHub  
