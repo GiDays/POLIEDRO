@@ -220,7 +220,7 @@ app.get('/partidas', async (req, res) => {
     const email = req.query.email;
     if (!email) return res.status(400).json({ error: 'Email não informado' });
 
-    const partidas = await Partida.find({ email }).sort({ data: -1 });
+    const partidas = await Partida.find({ email }).sort({ data: 1 }); // (1) da mais antiga para a mais recente, (-1) ao contrário 
     res.json(partidas);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar histórico' });
@@ -230,7 +230,7 @@ app.get('/partidas', async (req, res) => {
 // Rota para professor ver todas as tentativas 
 app.get('/partidas-todas', async (req, res) => {
   try {
-    const partidas = await Partida.find().sort({ data: -1 });
+    const partidas = await Partida.find().sort({ data: 1 });
     res.json(partidas);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar histórico geral' });

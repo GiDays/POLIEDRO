@@ -58,8 +58,10 @@ export default function CadastroUsuario() {
   };
 
   const handleFinalizarCadastro = async () => {
-    if (!email || !senha) {
+    if (!email || !senha || !nome) {
       Alert.alert('Erro', 'Preencha todos os campos!');
+      console.log('Preencha todos os campos');
+      alert('Preencha todos os campos!');
       return;
     }
 
@@ -71,7 +73,7 @@ export default function CadastroUsuario() {
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
       console.log('Cadastro realizado com sucesso');
       alert('Cadastro realizado com sucesso!');
-      router.push('../HomeScreen');
+      router.push('/(tabs)');
     } catch (error) {
       const err = error as any;
       Alert.alert('Erro', err.response?.data?.error || 'Não foi possível se conectar ao servidor.');

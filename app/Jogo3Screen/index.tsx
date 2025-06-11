@@ -217,7 +217,7 @@ export default function QuizScreen() {
 
             // Reinicie o jogo e vá para a tela inicial
             reiniciarJogo();
-            router.replace('../../(tabs)/HomeScreen');
+            router.replace('../../HomeScreen');
           }}
         >
           <Text style={styles.controlText}>Jogar Novamente</Text>
