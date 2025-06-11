@@ -19,7 +19,7 @@ const usuarioSchema = new mongoose.Schema({
 
 const Usuario = mongoose.model('Usuario', usuarioSchema);
 
- // Rota de cadastro
+ // Rota de cadastro de usuário
 app.post('/registro', async (req, res) => {
   console.log(req.body);
   const { nome, email, senha } = req.body;
@@ -44,7 +44,7 @@ app.post('/registro', async (req, res) => {
   }
 });
 
-// Rota de login
+// Rota de login de usuário
 app.post('/login', async (req, res) => {
   const { email, senha } = req.body;
 
@@ -85,11 +85,11 @@ const PerguntaSchema = new mongoose.Schema({
   correta: String,
   dica: String
 });
-const Pergunta = mongoose.model('Pergunta', PerguntaSchema, 'questoes'); // nome da coleção
+const Pergunta = mongoose.model('Pergunta', PerguntaSchema, 'questoes'); // nome da coleção no banco de dados
 const Pergunta2 = mongoose.model('Pergunta2', PerguntaSchema, 'questoes2');
 const Pergunta3 = mongoose.model('Pergunta3', PerguntaSchema, 'questoes3');
 
-// Rota GET /quiz (1 serie)
+// Pegar pergunta do banco de dados (1 serie)
 app.get('/quiz', async (req, res) => {
   try {
     const faceis = await Pergunta.aggregate([{ $match: { nivel: 'facil' } }, { $sample: { size: 3 } }]);
@@ -110,7 +110,7 @@ app.get('/quiz', async (req, res) => {
   }
 });
 
-// Rota GET /quiz (2 serie)
+// Pegar pergunta do banco de dados (2 serie)
 app.get('/quiz2', async (req, res) => {
   try {
     const faceis = await Pergunta2.aggregate([{ $match: { nivel: 'facil' } }, { $sample: { size: 3 } }]);
@@ -131,7 +131,7 @@ app.get('/quiz2', async (req, res) => {
   }
 });
 
-// Rota GET /quiz (3 serie)
+// Pegar pergunta do banco de dados (3 serie)
 app.get('/quiz3', async (req, res) => {
   try {
     const faceis = await Pergunta3.aggregate([{ $match: { nivel: 'facil' } }, { $sample: { size: 3 } }]);
@@ -202,6 +202,7 @@ const partidaSchema = new mongoose.Schema({
 });
 const Partida = mongoose.model('Partida', partidaSchema, 'tentativas');
 
+// Salvar partida por e-mail 
 app.post('/partidas', async (req, res) => {
   const { email, pontuacao,serie } = req.body;
   try {
@@ -213,7 +214,7 @@ app.post('/partidas', async (req, res) => {
   }
 });
 
-// get email alunos
+// Rota para o aluno ver suas tentativas (por e-mai)
 app.get('/partidas', async (req, res) => {
   try {
     const email = req.query.email;
@@ -226,7 +227,7 @@ app.get('/partidas', async (req, res) => {
   }
 });
 
-// Rota para professor ver todas as tentativas
+// Rota para professor ver todas as tentativas 
 app.get('/partidas-todas', async (req, res) => {
   try {
     const partidas = await Partida.find().sort({ data: -1 });
@@ -235,8 +236,6 @@ app.get('/partidas-todas', async (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar histórico geral' });
   }
 });
-
-
 
 // Servidor rodando (Rota de Teste)
 app.get('/', (req, res) => {
