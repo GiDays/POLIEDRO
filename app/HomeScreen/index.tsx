@@ -29,17 +29,17 @@ export default function StartScreen() {
   }, []);
 
   const handleStart = () => {
-    router.push('../../../(tabs)/SerieScreen');
+    router.push('../../SerieScreen');
   };
 
   const handleHistory = () => {
-    router.push('../../../(tabs)/HistoricoScreen');
+    router.push('../../HistoricoScreen');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
       <ImageBackground
-        source={require('../../../assets/images/TelaAzul.png')}
+        source={require('../../assets/images/TelaAzul.png')}
         style={styles.container}
         resizeMode="cover"
       >
@@ -58,9 +58,7 @@ export default function StartScreen() {
             POLIEDRO{"\n"}DO MILHÃO
           </Text>
 
-          <Image source={require('../../../assets/images/Coin.png')} style={styles.coin} />
-
-          {/* <Image source={require('../../../assets/images/Cortina1.png')} style={styles.Image} /> */}
+          <Image source={require('../../assets/images/Coin.png')} style={styles.coin} />
 
           <TouchableOpacity style={[styles.button, width > 768 && styles.buttonDesktop]} onPress={handleStart}>
             <Text style={styles.buttonText}>Jogar</Text>
@@ -125,16 +123,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
-  // Image: {
-  //   position: 'absolute',
-  //   top: 0,
-  //   transform: [{ translateY: -40 }],
-  //   width: '100%',
-  //   height: undefined,
-  //   aspectRatio: 3 / 2,
-  //   resizeMode: 'cover',
-  //   zIndex: -1,
-  // },
   soundIcon: {
     position: 'absolute',
     top: 40,

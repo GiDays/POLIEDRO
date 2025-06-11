@@ -31,7 +31,7 @@ export default function QuizScreen() {
         setIsPlaying(false);
       } else {
         const { sound: newSound } = await Audio.Sound.createAsync(
-          require('../../../assets/sound/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3')
+          require('../../assets/sound/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3')
         );
         setSound(newSound);
         setIsPlaying(true);
@@ -241,7 +241,7 @@ export default function QuizScreen() {
     return (
       <View style={styles.centered}>
         <Text style={{ color: '#FFF' }}>Nenhuma pergunta disponível.</Text>
-        <TouchableOpacity style={styles.controlButton} onPress={() => router.push('/')}>
+        <TouchableOpacity style={styles.controlButton} onPress={() => router.push('/HomeScreen')}>
           <Text style={styles.controlText}>Voltar ao início</Text>
         </TouchableOpacity>
       </View>
@@ -328,7 +328,7 @@ export default function QuizScreen() {
     <ScrollView contentContainerStyle={styles.scroll}>
       
       <ImageBackground
-        source={require('../../../assets/images/TelaAzul.png')}
+        source={require('../../assets/images/TelaAzul.png')}
         style={styles.container}
         resizeMode="cover"
       >
@@ -344,7 +344,7 @@ export default function QuizScreen() {
           {/* Cabeçalho */}
           <View style={styles.titleRow}>
             
-            <Image source={require('../../../assets/images/Coin.png')} style={styles.coin} />
+            <Image source={require('../../assets/images/Coin.png')} style={styles.coin} />
             
             <Text style={[styles.title, width > 768 && styles.titleDesktop]}>
               POLIEDRO{"\n"}DO MILHÃO

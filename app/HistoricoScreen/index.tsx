@@ -80,7 +80,7 @@ export default function HistoricoScreen() {
     
   return (
     <ImageBackground
-      source={require('../../../assets/images/TelaVermelha.png')}
+      source={require('../../assets/images/TelaVermelha.png')}
       style={styles.container}
       resizeMode="cover"
     >
@@ -89,9 +89,9 @@ export default function HistoricoScreen() {
         style={[styles.backIcon, isDesktop && styles.backIconDesktop]}
         onPress={() => {
           if (email?.endsWith('@sistemapoliedro.com.br')) {
-            router.push('../../../ProfessorScreen/');
+            router.push('../../ProfessorScreen/');
           } else {
-            router.push('../../../(tabs)/HomeScreen/');
+            router.push('../../HomeScreen/');
           }
         }}
       >
@@ -106,7 +106,7 @@ export default function HistoricoScreen() {
       <View style={[styles.overlay, isDesktop && styles.overlayDesktop]}>
         {/* Cabeçalho */}
         <View style={styles.titleRow}>
-          <Image source={require('../../../assets/images/Coin.png')} style={styles.coin} />
+          <Image source={require('../../assets/images/Coin.png')} style={styles.coin} />
           <Text style={[styles.title, isDesktop && styles.titleDesktop]}>POLIEDRO{"\n"}DO MILHÃO</Text>
         </View>
 

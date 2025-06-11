@@ -49,11 +49,11 @@ export default function App() {
     //alert('Login realizado com sucesso!');
 
     if (email.includes('@sistemapoliedro.com.br')) {
-      router.push('../(tabs)/ProfessorScreen/');
+      router.push('../../ProfessorScreen/');
     } else if (email.includes('@p4ed.com')) {
-      router.push('../../(tabs)/HomeScreen/');
+      router.push('../../HomeScreen/');
     } else {
-      router.push('../../(tabs)/HomeScreen/');
+      router.push('../../HomeScreen/');
     }
    
   } catch (erro) {
@@ -64,7 +64,7 @@ export default function App() {
 };
 
 const handleIrParaCadastro = () => {
-    router.push('../../(tabs)/CadastroScreen/'); 
+    router.push('../../CadastroScreen/'); 
   };
   
   //Música

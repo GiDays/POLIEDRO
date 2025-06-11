@@ -7,9 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 type Series = '1' | '2' | '3';
 
 const SERIES_GAME_SCREENS: Record<Series, string> = {
-  '1': '../../../(tabs)/Jogo1Screen/',
-  '2': '../../../(tabs)/Jogo2Screen/',
-  '3': '../../../(tabs)/Jogo3Screen/',
+  '1': '../../Jogo1Screen/',
+  '2': '../../Jogo2Screen/',
+  '3': '../../Jogo3Screen/',
 } as const;
 
 export default function SerieScreen() {
@@ -44,12 +44,12 @@ export default function SerieScreen() {
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
       <ImageBackground
-        source={require('../../../assets/images/TelaAzul.png')}
+        source={require('../../assets/images/TelaAzul.png')}
         style={styles.container}
         resizeMode="cover"
       >
         {/* Seta de voltar */}
-        <TouchableOpacity style={[styles.backIcon, width > 768 && styles.backIconDesktop]} onPress={() => router.push('/(tabs)/HomeScreen')}>
+        <TouchableOpacity style={[styles.backIcon, width > 768 && styles.backIconDesktop]} onPress={() => router.push('/HomeScreen')}>
           <Ionicons name="arrow-back" size={30} color="white" />
         </TouchableOpacity>
 
@@ -63,9 +63,7 @@ export default function SerieScreen() {
             POLIEDRO{"\n"}DO MILHÃO
           </Text>
 
-          <Image source={require('../../../assets/images/Coin.png')} style={styles.coin} />
-
-          {/* <Image source={require('../../../assets/images/Cortina1.png')} style={styles.Image} /> */}
+          <Image source={require('../../assets/images/Coin.png')} style={styles.coin} />
 
           <Text style={[styles.subtitle, width > 768 && styles.subtitleDesktop]}>
             SELECIONE SUA SÉRIE:
@@ -147,16 +145,6 @@ const styles = StyleSheet.create({
     height: 80,
     marginBottom: 30,
   },
-  // Image: {
-  //   position: 'absolute',
-  //   top: 0,
-  //   transform: [{ translateY: -40 }],
-  //   width: '100%',
-  //   height: undefined,
-  //   aspectRatio: 3 / 2,
-  //   resizeMode: 'cover',
-  //   zIndex: -1,
-  // },
   soundIcon: {
     position: 'absolute',
     top: 40,

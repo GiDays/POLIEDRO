@@ -38,7 +38,7 @@ export default function CadastroUsuario() {
         setIsPlaying(false);
       } else {
         const { sound: newSound } = await Audio.Sound.createAsync(
-          require('../../../assets/sound/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3')
+          require('../../assets/sound/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3')
         );
         setSound(newSound);
         setIsPlaying(true);
@@ -71,7 +71,7 @@ export default function CadastroUsuario() {
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
       console.log('Cadastro realizado com sucesso');
       alert('Cadastro realizado com sucesso!');
-      router.push('../(tabs)/HomeScreen');
+      router.push('../HomeScreen');
     } catch (error) {
       const err = error as any;
       Alert.alert('Erro', err.response?.data?.error || 'Não foi possível se conectar ao servidor.');
@@ -81,12 +81,12 @@ export default function CadastroUsuario() {
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
       <ImageBackground
-        source={require('../../../assets/images/TelaAzul.png')}
+        source={require('../../assets/images/TelaAzul.png')}
         style={styles.container}
         resizeMode="cover"
       >
         {/* Seta de voltar */}
-        <TouchableOpacity style={[styles.backIcon, width > 768 && styles.backIconDesktop]} onPress={() => router.push('../(tabs)')}>
+        <TouchableOpacity style={[styles.backIcon, width > 768 && styles.backIconDesktop]} onPress={() => router.push('/(tabs)')}>
           <Ionicons name="arrow-back" size={30} color="white" />
         </TouchableOpacity>
 
@@ -97,7 +97,7 @@ export default function CadastroUsuario() {
 
         <View style={[styles.overlay, width > 768 && styles.overlayDesktop]}>
           <Text style={[styles.title, width > 768 && styles.titleDesktop]}>POLIEDRO{"\n"}DO MILHÃO</Text>
-          <Image source={require('../../../assets/images/Coin.png')} style={styles.coin} />
+          <Image source={require('../../assets/images/Coin.png')} style={styles.coin} />
           <Text style={[styles.subtitle, width > 768 && styles.subtitleDesktop]}>CADASTRO USUÁRIO</Text>
 
           <TextInput

@@ -30,6 +30,10 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
+          //esconder a tab bar
+          tabBarStyle: { display: 'none' },
+          //esconder o botão da tab bar 
+          tabBarButton: () => null,
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />

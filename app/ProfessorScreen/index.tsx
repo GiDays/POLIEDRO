@@ -30,21 +30,21 @@ export default function StartScreen() {
   }, []);
 
   const handleCadastro = () => {
-    router.push('/(tabs)/CadastroScreen');
+    router.push('/CadastroScreen');
   };
 
   const handleEditar = () => {
-    router.push('../(tabs)/EditarScreen');
+    router.push('/EditarScreen');
   };
 
   const handleHistory = () => {
-    router.push('../../../(tabs)/HistoricoScreen');
+    router.push('/HistoricoScreen');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
       <ImageBackground
-        source={require('../../../assets/images/TelaAzul.png')}
+        source={require('../../assets/images/TelaAzul.png')}
         style={styles.container}
         resizeMode="cover"
       >
@@ -65,7 +65,7 @@ export default function StartScreen() {
             POLIEDRO{"\n"}DO MILHÃO
           </Text>
 
-          <Image source={require('../../../assets/images/Coin.png')} style={styles.coin} />
+          <Image source={require('../../assets/images/Coin.png')} style={styles.coin} />
 
           <TouchableOpacity style={[styles.button, width > 768 && styles.buttonDesktop]} onPress={handleCadastro}>
             <Text style={styles.buttonText}>Cadastrar Aluno</Text>

@@ -94,7 +94,7 @@ export default function EditarPerguntaScreen() {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       
       <ImageBackground
-        source={require('../../../assets/images/TelaAzul.png')}
+        source={require('../../assets/images/TelaAzul.png')}
         style={styles.container}
         resizeMode="cover"
       >
