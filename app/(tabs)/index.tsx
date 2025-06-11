@@ -26,45 +26,45 @@ export default function App() {
 
   // função de login 
   const handleLogin = async () => {
-  if (!email || !senha) {
-    alert('Preencha todos os campos!');
-    return;
-  }
-
-  try {
-    const resposta = await axios.post('http://192.168.0.18:5000/login', {
-      email,
-      senha
-    });
-
-    console.log('Login bem-sucedido:', resposta.data);
-
-    const { usuario } = resposta.data; // pega os dados do usuário
-    await AsyncStorage.setItem('usuario', JSON.stringify(usuario));
-
-    const teste = await AsyncStorage.getItem('usuario');
-    console.log('Verificando o que foi salvo no AsyncStorage:', teste);
-
-    alert(`Bem-vindo, ${usuario.nome}!`);
-    //alert('Login realizado com sucesso!');
-
-    if (email.includes('@sistemapoliedro.com.br')) {
-      router.push('../../ProfessorScreen/');
-    } else if (email.includes('@p4ed.com')) {
-      router.push('../../HomeScreen/');
-    } else {
-      router.push('../../HomeScreen/');
+    if (!email || !senha) {
+      alert('Preencha todos os campos!');
+      return;
     }
-   
-  } catch (erro) {
-    const err = erro as any;
-    console.error('Erro no login:', err.response?.data || err.message);
-    alert(err.response?.data?.mensagem || 'Erro ao tentar logar!');
-  }
-};
 
-const handleIrParaCadastro = () => {
-    router.push('../../CadastroScreen/'); 
+    try {
+      const resposta = await axios.post('http://192.168.0.18:5000/login', {
+        email,
+        senha
+      });
+
+      console.log('Login bem-sucedido:', resposta.data);
+
+      const { usuario } = resposta.data; // pega os dados do usuário
+      await AsyncStorage.setItem('usuario', JSON.stringify(usuario));
+
+      const teste = await AsyncStorage.getItem('usuario');
+      console.log('Verificando o que foi salvo no AsyncStorage:', teste);
+
+      alert(`Bem-vindo, ${usuario.nome}!`);
+      //alert('Login realizado com sucesso!');
+
+      if (email.includes('@sistemapoliedro.com.br')) {
+        router.push('../../ProfessorScreen/');
+      } else if (email.includes('@p4ed.com')) {
+        router.push('../../HomeScreen/');
+      } else {
+        router.push('../../HomeScreen/');
+      }
+    
+    } catch (erro) {
+      const err = erro as any;
+      console.error('Erro no login:', err.response?.data || err.message);
+      alert(err.response?.data?.mensagem || 'Erro ao tentar logar!');
+    }
+  };
+
+  const handleIrParaCadastro = () => {
+      router.push('../../CadastroScreen/'); 
   };
   
   //Música
@@ -111,17 +111,15 @@ const handleIrParaCadastro = () => {
         <TouchableOpacity
           style={[styles.soundIcon, width > 768 && styles.soundIconDesktop]}
           onPress={playSound}
->
+        >
           <Ionicons name="volume-high" size={30} color="white" />
         </TouchableOpacity>
 
-
         {/* largura maior que 768 ativa um estilo para 'desktop' */}
         <View style={[styles.overlay, width > 768 && styles.overlayDesktop]}>
+          
           <Text style={[styles.title, width > 768 && styles.titleDesktop]}>POLIEDRO{"\n"}DO MILHÃO</Text>
           <Image source={require('../../assets/images/Coin.png')} style={styles.coin} />  
-          
-          {/* <Image source={require('../../assets/images/Cortina1.png')} style={styles.Image}/> */}
 
           <TextInput
             style={[styles.input, width > 768 ? styles.inputDesktop : null]}
@@ -144,10 +142,10 @@ const handleIrParaCadastro = () => {
           </TouchableOpacity>
           
           <View style={styles.row}>
-          <Text style={styles.text}>Ainda não tem conta?</Text>
-          <TouchableOpacity style={styles.button1} onPress={handleIrParaCadastro}>
-            <Text style={styles.buttonText1}>Cadastre-se</Text>
-          </TouchableOpacity>
+            <Text style={styles.text}>Ainda não tem conta?</Text>
+            <TouchableOpacity style={styles.button1} onPress={handleIrParaCadastro}>
+              <Text style={styles.buttonText1}>Cadastre-se</Text>
+            </TouchableOpacity>
           </View>
 
         </View>
